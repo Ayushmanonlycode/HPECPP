@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  # Spring Boot services — /actuator/prometheus
+  - job_name: 'spring-boot-services'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets:
+          - 'sb-api-gateway:8080'
+          - 'sb-user-service:8081'
+          - 'sb-catalog-service:8082'
+          - 'sb-inventory-service:8083'
+          - 'sb-order-capture-service:8084'
+          - 'sb-order-fulfilment-service:8085'
+          - 'sb-cart-service:8086'
+
+  # WildFly services — /metrics
+  - job_name: 'wildfly-services'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+          - 'wf-api-gateway:8080'
+          - 'wf-user-service:8080'
+          - 'wf-catalog-service:8080'
+          - 'wf-inventory-service:8080'
+          - 'wf-order-capture-service:8080'
+          - 'wf-order-fulfilment-service:8080'
+          - 'wf-cart-service:8080'

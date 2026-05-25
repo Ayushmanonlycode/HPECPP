@@ -1,0 +1,359 @@
+version: "3.9"
+
+# Profiles:  spring | wildfly | observability
+
+networks:
+  showdown-net:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+services:
+
+  # ── Observability ──────────────────────────────────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: jaeger
+    profiles: [observability, spring, wildfly]
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    networks: [showdown-net]
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: prometheus
+    profiles: [observability, spring, wildfly]
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks: [showdown-net]
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    profiles: [observability, spring, wildfly]
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    networks: [showdown-net]
+
+  # ── Spring Boot Databases ──────────────────────────────────────
+  sb-user-db:
+    image: postgres:16-alpine
+    container_name: sb-user-db
+    profiles: [spring]
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5431:5432"
+    networks: [showdown-net]
+
+  sb-catalog-db:
+    image: postgres:16-alpine
+    container_name: sb-catalog-db
+    profiles: [spring]
+    environment:
+      POSTGRES_DB: catalogdb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5432:5432"
+    networks: [showdown-net]
+
+  sb-inventory-db:
+    image: postgres:16-alpine
+    container_name: sb-inventory-db
+    profiles: [spring]
+    environment:
+      POSTGRES_DB: inventorydb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5433:5432"
+    networks: [showdown-net]
+
+  sb-order-capture-db:
+    image: postgres:16-alpine
+    container_name: sb-order-capture-db
+    profiles: [spring]
+    environment:
+      POSTGRES_DB: ordercapturedb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5434:5432"
+    networks: [showdown-net]
+
+  sb-order-fulfilment-db:
+    image: postgres:16-alpine
+    container_name: sb-order-fulfilment-db
+    profiles: [spring]
+    environment:
+      POSTGRES_DB: orderfulfilmentdb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5435:5432"
+    networks: [showdown-net]
+
+  sb-cart-db:
+    image: redis:7-alpine
+    container_name: sb-cart-db
+    profiles: [spring]
+    ports:
+      - "6379:6379"
+    networks: [showdown-net]
+
+  # ── Spring Boot Services ───────────────────────────────────────
+  sb-api-gateway:
+    build: ./spring-boot/api-gateway
+    container_name: sb-api-gateway
+    profiles: [spring]
+    ports:
+      - "8080:8080"
+    networks: [showdown-net]
+
+  sb-user-service:
+    build: ./spring-boot/user-service
+    container_name: sb-user-service
+    profiles: [spring]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://sb-user-db:5432/userdb
+      SPRING_DATASOURCE_USERNAME: showdown
+      SPRING_DATASOURCE_PASSWORD: showdown123
+    ports:
+      - "8081:8081"
+    depends_on: [sb-user-db]
+    networks: [showdown-net]
+
+  sb-catalog-service:
+    build: ./spring-boot/catalog-service
+    container_name: sb-catalog-service
+    profiles: [spring]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://sb-catalog-db:5432/catalogdb
+      SPRING_DATASOURCE_USERNAME: showdown
+      SPRING_DATASOURCE_PASSWORD: showdown123
+    ports:
+      - "8082:8082"
+    depends_on: [sb-catalog-db]
+    networks: [showdown-net]
+
+  sb-inventory-service:
+    build: ./spring-boot/inventory-service
+    container_name: sb-inventory-service
+    profiles: [spring]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://sb-inventory-db:5432/inventorydb
+      SPRING_DATASOURCE_USERNAME: showdown
+      SPRING_DATASOURCE_PASSWORD: showdown123
+    ports:
+      - "8083:8083"
+    depends_on: [sb-inventory-db]
+    networks: [showdown-net]
+
+  sb-order-capture-service:
+    build: ./spring-boot/order-capture-service
+    container_name: sb-order-capture-service
+    profiles: [spring]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://sb-order-capture-db:5432/ordercapturedb
+      SPRING_DATASOURCE_USERNAME: showdown
+      SPRING_DATASOURCE_PASSWORD: showdown123
+    ports:
+      - "8084:8084"
+    depends_on: [sb-order-capture-db]
+    networks: [showdown-net]
+
+  sb-order-fulfilment-service:
+    build: ./spring-boot/order-fulfilment-service
+    container_name: sb-order-fulfilment-service
+    profiles: [spring]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://sb-order-fulfilment-db:5432/orderfulfilmentdb
+      SPRING_DATASOURCE_USERNAME: showdown
+      SPRING_DATASOURCE_PASSWORD: showdown123
+    ports:
+      - "8085:8085"
+    depends_on: [sb-order-fulfilment-db]
+    networks: [showdown-net]
+
+  sb-cart-service:
+    build: ./spring-boot/cart-service
+    container_name: sb-cart-service
+    profiles: [spring]
+    environment:
+      SPRING_DATA_REDIS_HOST: sb-cart-db
+    ports:
+      - "8086:8086"
+    depends_on: [sb-cart-db]
+    networks: [showdown-net]
+
+  # ── WildFly Databases ─────────────────────────────────────────
+  wf-user-db:
+    image: postgres:16-alpine
+    container_name: wf-user-db
+    profiles: [wildfly]
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5441:5432"
+    networks: [showdown-net]
+
+  wf-catalog-db:
+    image: postgres:16-alpine
+    container_name: wf-catalog-db
+    profiles: [wildfly]
+    environment:
+      POSTGRES_DB: catalogdb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5442:5432"
+    networks: [showdown-net]
+
+  wf-inventory-db:
+    image: postgres:16-alpine
+    container_name: wf-inventory-db
+    profiles: [wildfly]
+    environment:
+      POSTGRES_DB: inventorydb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5443:5432"
+    networks: [showdown-net]
+
+  wf-order-capture-db:
+    image: postgres:16-alpine
+    container_name: wf-order-capture-db
+    profiles: [wildfly]
+    environment:
+      POSTGRES_DB: ordercapturedb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5444:5432"
+    networks: [showdown-net]
+
+  wf-order-fulfilment-db:
+    image: postgres:16-alpine
+    container_name: wf-order-fulfilment-db
+    profiles: [wildfly]
+    environment:
+      POSTGRES_DB: orderfulfilmentdb
+      POSTGRES_USER: showdown
+      POSTGRES_PASSWORD: showdown123
+    ports:
+      - "5445:5432"
+    networks: [showdown-net]
+
+  wf-cart-db:
+    image: redis:7-alpine
+    container_name: wf-cart-db
+    profiles: [wildfly]
+    ports:
+      - "6380:6379"
+    networks: [showdown-net]
+
+  # ── WildFly Services ──────────────────────────────────────────
+  wf-api-gateway:
+    build: ./wildfly-microprofile/api-gateway
+    container_name: wf-api-gateway
+    profiles: [wildfly]
+    ports:
+      - "9080:8080"
+    networks: [showdown-net]
+
+  wf-user-service:
+    build: ./wildfly-microprofile/user-service
+    container_name: wf-user-service
+    profiles: [wildfly]
+    environment:
+      DB_URL: jdbc:postgresql://wf-user-db:5432/userdb
+      DB_USER: showdown
+      DB_PASSWORD: showdown123
+    ports:
+      - "9081:8080"
+    depends_on: [wf-user-db]
+    networks: [showdown-net]
+
+  wf-catalog-service:
+    build: ./wildfly-microprofile/catalog-service
+    container_name: wf-catalog-service
+    profiles: [wildfly]
+    environment:
+      DB_URL: jdbc:postgresql://wf-catalog-db:5432/catalogdb
+      DB_USER: showdown
+      DB_PASSWORD: showdown123
+    ports:
+      - "9082:8080"
+    depends_on: [wf-catalog-db]
+    networks: [showdown-net]
+
+  wf-inventory-service:
+    build: ./wildfly-microprofile/inventory-service
+    container_name: wf-inventory-service
+    profiles: [wildfly]
+    environment:
+      DB_URL: jdbc:postgresql://wf-inventory-db:5432/inventorydb
+      DB_USER: showdown
+      DB_PASSWORD: showdown123
+    ports:
+      - "9083:8080"
+    depends_on: [wf-inventory-db]
+    networks: [showdown-net]
+
+  wf-order-capture-service:
+    build: ./wildfly-microprofile/order-capture-service
+    container_name: wf-order-capture-service
+    profiles: [wildfly]
+    environment:
+      DB_URL: jdbc:postgresql://wf-order-capture-db:5432/ordercapturedb
+      DB_USER: showdown
+      DB_PASSWORD: showdown123
+    ports:
+      - "9084:8080"
+    depends_on: [wf-order-capture-db]
+    networks: [showdown-net]
+
+  wf-order-fulfilment-service:
+    build: ./wildfly-microprofile/order-fulfilment-service
+    container_name: wf-order-fulfilment-service
+    profiles: [wildfly]
+    environment:
+      DB_URL: jdbc:postgresql://wf-order-fulfilment-db:5432/orderfulfilmentdb
+      DB_USER: showdown
+      DB_PASSWORD: showdown123
+    ports:
+      - "9085:8080"
+    depends_on: [wf-order-fulfilment-db]
+    networks: [showdown-net]
+
+  wf-cart-service:
+    build: ./wildfly-microprofile/cart-service
+    container_name: wf-cart-service
+    profiles: [wildfly]
+    environment:
+      REDIS_HOST: wf-cart-db
+    ports:
+      - "9086:8080"
+    depends_on: [wf-cart-db]
+    networks: [showdown-net]
