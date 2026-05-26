@@ -8,6 +8,8 @@ public class CatalogServiceApplication extends Application {
     @Path("/health")
     public static class HealthResource {
         @GET @Produces("text/plain")
-        public String health() { return "catalog-service running"; }
+        public String health() {
+            return "Catalog Service Running!!!";
+        }
     }
 }
