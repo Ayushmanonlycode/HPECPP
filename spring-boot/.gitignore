@@ -1,0 +1,52 @@
+# ── Build artifacts ───────────────────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+build/
+
+# ── IDE files ─────────────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+nbproject/
+nb-dist/
+
+# ── OS files ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Environment & secrets ────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Spring Boot ───────────────────────────────────────────────
+*.jar
+*.war
+*.ear
+application-local.properties
+application-local.yml
+
+# ── Maven wrapper (keep wrapper jar, ignore everything else) ─
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# ── Misc generated ───────────────────────────────────────────
+hs_err_pid*
+replay_pid*
+*.class
+*.bak
+*.tmp
+*.swp
+*~
