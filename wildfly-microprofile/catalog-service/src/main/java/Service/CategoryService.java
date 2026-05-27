@@ -14,7 +14,7 @@ public class CategoryService {
     @Inject
     CategoryRepo categoryRepo;
 
-    public List<Category> getAllCategories() {
+    public List<Category> getCategories() {
         return categoryRepo.getCategories();
     }
 
@@ -22,4 +22,7 @@ public class CategoryService {
         return categoryRepo.addCategory(category);
     }
 
+    public List<Category> getCategoriesById(String id) {
+        return categoryRepo.getCategoriesById(id);
+    }
 }

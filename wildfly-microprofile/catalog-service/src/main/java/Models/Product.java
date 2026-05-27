@@ -9,17 +9,17 @@ import jakarta.persistence.Id;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+
+    private String id;
     private String name;
     private String category;
     private String availability;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

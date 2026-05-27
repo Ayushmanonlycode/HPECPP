@@ -21,9 +21,15 @@ public class ProductRepo {
 
     };
 
-    public List<Product> getProductsbyName(String name){
-        return em.createQuery("SELECT p FROM Product p WHERE p.name = :name", Product.class)
-                .setParameter("name", name)
+    public List<Product> getProductsbyId(String id){
+        return em.createQuery("SELECT p FROM Product p WHERE p.id = :id", Product.class)
+                .setParameter("id", id)
+                .getResultList();
+    }
+
+    public List<Product> getProductsbyCategory(String category){
+        return em.createQuery("SELECT p FROM Product p WHERE p.category= :category", Product.class)
+                .setParameter("category", category)
                 .getResultList();
     }
 

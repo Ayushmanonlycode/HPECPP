@@ -2,9 +2,11 @@ package Controllers;
 
 import Models.Category;
 import Repository.CategoryRepo;
+import Service.CategoryService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -12,27 +14,41 @@ import java.util.List;
 public class CategoryController {
 
     @Inject
-    private CategoryRepo categoryRepo;
+    private CategoryService categoryService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("all")
     public List<Category> getCategories() {
-        return categoryRepo.getCategories();
+        return categoryService.getCategories();
 
     }
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/search")
+    public List<Category> getCategories(@QueryParam("id") String id) {
+        return categoryService.getCategoriesById(id);
+
+    }
+
+
+
 
     @POST
-    @Produces("text/plain")
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/add")
-    public String addCategory(Category category) {
-        int res= categoryRepo.addCategory(category);
+    public Response addCategory(Category category) {
+        int res= categoryService.addCategory(category);
 
         if(res==0){
-            return "Category Added Successfully!!!";
+            return Response.status(Response.Status.OK).build();
 
         }
-        return "Category NOT Added";
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
+
+
+
 }

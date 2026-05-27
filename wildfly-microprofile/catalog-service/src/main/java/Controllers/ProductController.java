@@ -5,6 +5,7 @@ import Service.ProductService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -26,14 +27,14 @@ public class ProductController {
     @Path("/add")
     @Produces("text/plain")
     @Consumes(MediaType.APPLICATION_JSON)
-    public String addProduct(Product product){
+    public Response addProduct(Product product){
         int res=productService.addProduct(product);
 
         if(res==0){
-            return "Product Added Successfully!!!";
+            return Response.status(Response.Status.OK).build();
         }
 
-        return "Product NOT Added";
+        return Response.status(Response.Status.BAD_REQUEST).build();
 
     }
 
@@ -41,8 +42,17 @@ public class ProductController {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Product> getProductsbyName(@QueryParam("name") String name){
-        return productService.getProductsbyName(name);
+    public List<Product> getProductsbyId(@QueryParam("id") String id){
+        return productService.getProductsbyId(id);
+
+    }
+
+
+    @GET
+    @Path("/search/category")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Product> getProductsbyCategory(@QueryParam("cat") String category){
+        return productService.getProductsByCategory(category);
 
     }
 

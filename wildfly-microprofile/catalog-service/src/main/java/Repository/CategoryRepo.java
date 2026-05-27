@@ -31,4 +31,10 @@ public class CategoryRepo {
 
         return 0;
     }
+
+    public List<Category> getCategoriesById(String id){
+        return em.createQuery("SELECT p FROM Category p WHERE p.id= :id", Category.class)
+                .setParameter("id", id)
+                .getResultList();
+    }
 }
