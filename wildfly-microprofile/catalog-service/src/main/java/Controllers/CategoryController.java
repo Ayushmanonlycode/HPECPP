@@ -43,7 +43,7 @@ public class CategoryController {
         int res= categoryService.addCategory(category);
 
         if(res==0){
-            return Response.status(Response.Status.OK).build();
+            return Response.ok("Category Added Successfully").build();
 
         }
         return Response.status(Response.Status.BAD_REQUEST).build();

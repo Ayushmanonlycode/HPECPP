@@ -1,16 +1,18 @@
 package Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Item {
 
     @Id
     private String id;
-    private String productId;
+
     private String itemName;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     public String getId() {
         return id;
@@ -18,14 +20,6 @@ public class Item {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
     }
 
     public String getItemName() {
@@ -36,5 +30,11 @@ public class Item {
         this.itemName = itemName;
     }
 
+    public Product getProduct() {
+        return product;
+    }
 
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 }

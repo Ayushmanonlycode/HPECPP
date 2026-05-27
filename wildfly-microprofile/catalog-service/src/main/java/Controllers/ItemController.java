@@ -1,5 +1,6 @@
 package Controllers;
 
+import Models.DTO.ItemDto;
 import Models.Item;
 import Service.ItemService;
 import Service.ProductService;
@@ -44,11 +45,11 @@ public class ItemController {
     @POST
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addItem(Item item){
+    public Response addItem(ItemDto item){
         int res= itemService.addItem(item);
 
         if(res==0){
-            return Response.status(Response.Status.OK).build();
+            return Response.ok("Item added Successfully!!!").build();
         }
 
         return Response.status(Response.Status.BAD_REQUEST).build();

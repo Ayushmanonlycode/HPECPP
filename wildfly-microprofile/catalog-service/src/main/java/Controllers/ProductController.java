@@ -1,5 +1,6 @@
 package Controllers;
 
+import Models.DTO.ProductDto;
 import Models.Product;
 import Service.ProductService;
 import jakarta.inject.Inject;
@@ -27,11 +28,11 @@ public class ProductController {
     @Path("/add")
     @Produces("text/plain")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addProduct(Product product){
+    public Response addProduct(ProductDto product){
         int res=productService.addProduct(product);
 
         if(res==0){
-            return Response.status(Response.Status.OK).build();
+            return Response.ok("Product Added Successfully!!!").build();
         }
 
         return Response.status(Response.Status.BAD_REQUEST).build();

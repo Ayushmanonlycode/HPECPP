@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.GET;
@@ -27,9 +28,18 @@ public class CategoryRepo {
 
     @Transactional
     public int addCategory(Category category) {
-        em.persist(category);
+        try {
 
-        return 0;
+            em.persist(category);
+
+            em.flush();
+
+            return 0;
+
+        } catch (PersistenceException e) {
+
+            return 1;
+        }
     }
 
     public List<Category> getCategoriesById(String id){

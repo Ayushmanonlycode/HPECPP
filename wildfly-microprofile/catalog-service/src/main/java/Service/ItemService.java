@@ -1,6 +1,7 @@
 package Service;
 
 
+import Models.DTO.ItemDto;
 import Models.Item;
 import Repository.ItemRepo;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +20,7 @@ public class ItemService {
     }
 
 
-    public int addItem(Item item){
+    public int addItem(ItemDto item){
         return itemRepo.addItem(item);
     }
 

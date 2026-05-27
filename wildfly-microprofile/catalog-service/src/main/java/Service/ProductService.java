@@ -1,9 +1,11 @@
 package Service;
 
+import Models.DTO.ProductDto;
 import Models.Product;
 import Repository.ProductRepo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
@@ -17,7 +19,8 @@ public class ProductService {
         return productRepo.getProducts();
     }
 
-    public int addProduct(Product product){
+    @Transactional
+    public int addProduct(ProductDto product){
         return productRepo.addProduct(product);
     }
 
