@@ -1,6 +1,7 @@
 package Service;
 
 import Models.Category;
+import Models.DTO.CategoryDto;
 import Repository.CategoryRepo;
 import Repository.ProductRepo;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,7 +15,7 @@ public class CategoryService {
     @Inject
     CategoryRepo categoryRepo;
 
-    public List<Category> getCategories() {
+    public List<CategoryDto> getCategories() {
         return categoryRepo.getCategories();
     }
 

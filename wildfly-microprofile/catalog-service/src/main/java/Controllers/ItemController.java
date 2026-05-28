@@ -20,7 +20,7 @@ public class ItemController {
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Item> getItems() {
+    public List<ItemDto> getItems() {
 
         return itemService.getItems();
 

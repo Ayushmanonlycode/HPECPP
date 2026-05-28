@@ -1,6 +1,7 @@
 package Repository;
 
 import Models.Category;
+import Models.DTO.CategoryDto;
 import Models.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.Entity;
@@ -19,10 +20,17 @@ public class CategoryRepo {
     private EntityManager em;
 
 
-    public List<Category> getCategories() {
-        return em.createQuery(
-                        "SELECT p FROM Category p", Category.class)
-                .getResultList();
+    public List<CategoryDto> getCategories() {
+        return em.createQuery("SELECT c FROM Category c", Category.class)
+                .getResultList()
+                .stream()
+                .map(c -> {
+                    CategoryDto dto = new CategoryDto();
+                    dto.setId(c.getId());
+                    dto.setCategoryName(c.getCategoryName());
+                    return dto;
+                })
+                .toList();
     }
 
 

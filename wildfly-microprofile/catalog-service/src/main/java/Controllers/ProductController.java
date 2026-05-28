@@ -19,7 +19,7 @@ public class ProductController {
     @GET
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Product> getProducts(){
+    public List<ProductDto> getProducts(){
         return productService.getAllProducts();
 
     }

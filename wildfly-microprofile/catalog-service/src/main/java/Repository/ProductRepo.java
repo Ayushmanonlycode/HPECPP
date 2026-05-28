@@ -17,12 +17,22 @@ public class ProductRepo {
     @PersistenceContext
     private EntityManager em;
 
-    public List<Product> getProducts() {
-        return em.createQuery(
-                        "SELECT p FROM Product p", Product.class)
-                .getResultList();
-
-    };
+    public List<ProductDto> getProducts() {
+        return em.createQuery("SELECT p FROM Product p", Product.class)
+                .getResultList()
+                .stream()
+                .map(p -> {
+                    ProductDto dto = new ProductDto();
+                    dto.setId(p.getId());
+                    dto.setName(p.getName());
+                    dto.setAvailability(p.getAvailability());
+                    if (p.getCategory() != null) {
+                        dto.setCategoryId(p.getCategory().getId());
+                    }
+                    return dto;
+                })
+                .toList();
+    }
 
     public List<Product> getProductsbyId(String id){
         return em.createQuery("SELECT p FROM Product p WHERE p.id = :id", Product.class)

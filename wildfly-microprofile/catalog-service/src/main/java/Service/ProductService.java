@@ -15,7 +15,7 @@ public class ProductService {
     @Inject
     ProductRepo productRepo;
 
-    public List<Product> getAllProducts() {
+    public List<ProductDto> getAllProducts() {
         return productRepo.getProducts();
     }
 

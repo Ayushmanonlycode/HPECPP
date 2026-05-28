@@ -15,7 +15,7 @@ public class ItemService {
     @Inject
     ItemRepo itemRepo;
 
-    public List<Item> getItems() {
+    public List<ItemDto> getItems() {
         return itemRepo.getItems();
     }
 

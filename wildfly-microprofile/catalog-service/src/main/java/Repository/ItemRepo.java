@@ -18,8 +18,20 @@ public class ItemRepo {
     @PersistenceContext
     private EntityManager em;
 
-    public List<Item> getItems() {
-        return em.createQuery("SELECT i FROM Item i", Item.class).getResultList();
+    public List<ItemDto> getItems() {
+        return em.createQuery("SELECT i FROM Item i", Item.class)
+                .getResultList()
+                .stream()
+                .map(i -> {
+                    ItemDto dto = new ItemDto();
+                    dto.setId(i.getId());
+                    dto.setItemName(i.getItemName());
+                    if (i.getProduct() != null) {
+                        dto.setProductId(i.getProduct().getId());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 
 

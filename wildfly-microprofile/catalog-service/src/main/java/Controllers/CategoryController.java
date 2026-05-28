@@ -1,6 +1,7 @@
 package Controllers;
 
 import Models.Category;
+import Models.DTO.CategoryDto;
 import Repository.CategoryRepo;
 import Service.CategoryService;
 import jakarta.inject.Inject;
@@ -19,7 +20,7 @@ public class CategoryController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("all")
-    public List<Category> getCategories() {
+    public List<CategoryDto> getCategories() {
         return categoryService.getCategories();
 
     }
