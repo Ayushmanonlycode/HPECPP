@@ -29,7 +29,7 @@ public class CategoryController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/search")
-    public List<Category> getCategories(@QueryParam("id") String id) {
+    public List<CategoryDto> getCategories(@QueryParam("id") String id) {
         return categoryService.getCategoriesById(id);
 
     }
@@ -40,7 +40,7 @@ public class CategoryController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/add")
-    public Response addCategory(Category category) {
+    public Response addCategory(CategoryDto category) {
         int res= categoryService.addCategory(category);
 
         if(res==0){

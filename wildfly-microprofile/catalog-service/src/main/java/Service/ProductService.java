@@ -25,11 +25,11 @@ public class ProductService {
     }
 
 
-    public List<Product> getProductsbyId(String id){
+    public List<ProductDto> getProductsbyId(String id){
         return productRepo.getProductsbyId(id);
     }
 
-    public List<Product> getProductsByCategory(String category){
+    public List<ProductDto> getProductsByCategory(String category){
         return productRepo.getProductsbyCategory(category);
     }
 

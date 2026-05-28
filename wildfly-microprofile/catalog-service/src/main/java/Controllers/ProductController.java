@@ -43,7 +43,7 @@ public class ProductController {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Product> getProductsbyId(@QueryParam("id") String id){
+    public List<ProductDto> getProductsbyId(@QueryParam("id") String id){
         return productService.getProductsbyId(id);
 
     }
@@ -52,7 +52,7 @@ public class ProductController {
     @GET
     @Path("/search/category")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Product> getProductsbyCategory(@QueryParam("cat") String category){
+    public List<ProductDto> getProductsbyCategory(@QueryParam("cat") String category){
         return productService.getProductsByCategory(category);
 
     }

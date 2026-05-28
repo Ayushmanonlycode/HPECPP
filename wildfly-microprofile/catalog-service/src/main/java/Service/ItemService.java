@@ -24,11 +24,11 @@ public class ItemService {
         return itemRepo.addItem(item);
     }
 
-    public List<Item> getItemsById(String id) {
+    public List<ItemDto> getItemsById(String id) {
         return itemRepo.getItemsById(id);
     }
 
-    public List<Item> getItemsByProductId(String pid) {
+    public List<ItemDto> getItemsByProductId(String pid) {
         return itemRepo.getItemsByProductId(pid);
     }
 }

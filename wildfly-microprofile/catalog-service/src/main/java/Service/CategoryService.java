@@ -19,11 +19,11 @@ public class CategoryService {
         return categoryRepo.getCategories();
     }
 
-    public int addCategory(Category category) {
+    public int addCategory(CategoryDto category) {
         return categoryRepo.addCategory(category);
     }
 
-    public List<Category> getCategoriesById(String id) {
+    public List<CategoryDto> getCategoriesById(String id) {
         return categoryRepo.getCategoriesById(id);
     }
 }

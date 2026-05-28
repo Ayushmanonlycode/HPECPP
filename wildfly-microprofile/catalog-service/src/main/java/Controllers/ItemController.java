@@ -30,14 +30,14 @@ public class ItemController {
     @GET
     @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Item> getItemsById(@QueryParam("id") String id) {
+    public List<ItemDto> getItemsById(@QueryParam("id") String id) {
         return itemService.getItemsById(id);
     }
 
     @GET
     @Path("/search/productId")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Item> getItemsByProductId(@QueryParam("pid") String pid) {
+    public List<ItemDto> getItemsByProductId(@QueryParam("pid") String pid) {
         return itemService.getItemsByProductId(pid);
     }
 

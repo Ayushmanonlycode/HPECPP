@@ -34,19 +34,40 @@ public class ProductRepo {
                 .toList();
     }
 
-    public List<Product> getProductsbyId(String id){
+    public List<ProductDto> getProductsbyId(String id) {
         return em.createQuery("SELECT p FROM Product p WHERE p.id = :id", Product.class)
                 .setParameter("id", id)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .map(p -> {
+                    ProductDto dto = new ProductDto();
+                    dto.setId(p.getId());
+                    dto.setName(p.getName());
+                    dto.setAvailability(p.getAvailability());
+                    if (p.getCategory() != null) {
+                        dto.setCategoryId(p.getCategory().getId());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 
-    public List<Product> getProductsbyCategory(String categoryId){
-
-        return em.createQuery(
-                        "SELECT p FROM Product p WHERE p.category.id = :categoryId",
-                        Product.class)
+    public List<ProductDto> getProductsbyCategory(String categoryId) {
+        return em.createQuery("SELECT p FROM Product p WHERE p.category.id = :categoryId", Product.class)
                 .setParameter("categoryId", categoryId)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .map(p -> {
+                    ProductDto dto = new ProductDto();
+                    dto.setId(p.getId());
+                    dto.setName(p.getName());
+                    dto.setAvailability(p.getAvailability());
+                    if (p.getCategory() != null) {
+                        dto.setCategoryId(p.getCategory().getId());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 
 

@@ -2,6 +2,8 @@ package Models;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 public class Item {
 
@@ -13,6 +15,8 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    private BigDecimal price;
 
     public String getId() {
         return id;
@@ -36,5 +40,14 @@ public class Item {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

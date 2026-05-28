@@ -35,24 +35,33 @@ public class CategoryRepo {
 
 
     @Transactional
-    public int addCategory(Category category) {
+    public int addCategory(CategoryDto dto) {
         try {
+            Category category = new Category();
+            category.setId(dto.getId());
+            category.setCategoryName(dto.getCategoryName());
 
             em.persist(category);
-
             em.flush();
-
             return 0;
 
         } catch (PersistenceException e) {
-
+            e.printStackTrace();
             return 1;
         }
     }
 
-    public List<Category> getCategoriesById(String id){
-        return em.createQuery("SELECT p FROM Category p WHERE p.id= :id", Category.class)
+    public List<CategoryDto> getCategoriesById(String id) {
+        return em.createQuery("SELECT c FROM Category c WHERE c.id = :id", Category.class)
                 .setParameter("id", id)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .map(c -> {
+                    CategoryDto dto = new CategoryDto();
+                    dto.setId(c.getId());
+                    dto.setCategoryName(c.getCategoryName());
+                    return dto;
+                })
+                .toList();
     }
 }

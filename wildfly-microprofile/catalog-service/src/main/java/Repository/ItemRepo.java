@@ -26,6 +26,7 @@ public class ItemRepo {
                     ItemDto dto = new ItemDto();
                     dto.setId(i.getId());
                     dto.setItemName(i.getItemName());
+                    dto.setPrice(i.getPrice());
                     if (i.getProduct() != null) {
                         dto.setProductId(i.getProduct().getId());
                     }
@@ -41,6 +42,7 @@ public class ItemRepo {
             Item item = new Item();
             item.setId(dto.getId());
             item.setItemName(dto.getItemName());
+            item.setPrice(dto.getPrice());
 
             if (dto.getProductId() != null) {
                 Product product = em.getReference(Product.class, dto.getProductId());
@@ -56,17 +58,39 @@ public class ItemRepo {
         }
     }
 
-    public List<Item> getItemsById(String id) {
-        return em.createQuery("SELECT i FROM Item i WHERE i.id= :id", Item.class)
+    public List<ItemDto> getItemsById(String id) {
+        return em.createQuery("SELECT i FROM Item i WHERE i.id = :id", Item.class)
                 .setParameter("id", id)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .map(i -> {
+                    ItemDto dto = new ItemDto();
+                    dto.setId(i.getId());
+                    dto.setItemName(i.getItemName());
+                    dto.setPrice(i.getPrice());
+                    if (i.getProduct() != null) {
+                        dto.setProductId(i.getProduct().getId());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 
-    public List<Item> getItemsByProductId(String pid) {
-        return em.createQuery(
-                        "SELECT i FROM Item i WHERE i.product.id = :pid",
-                        Item.class)
+    public List<ItemDto> getItemsByProductId(String pid) {
+        return em.createQuery("SELECT i FROM Item i WHERE i.product.id = :pid", Item.class)
                 .setParameter("pid", pid)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .map(i -> {
+                    ItemDto dto = new ItemDto();
+                    dto.setId(i.getId());
+                    dto.setItemName(i.getItemName());
+                    dto.setPrice(i.getPrice());
+                    if (i.getProduct() != null) {
+                        dto.setProductId(i.getProduct().getId());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 }
