@@ -8,6 +8,6 @@ public class OrderCaptureServiceApplication extends Application {
     @Path("/health")
     public static class HealthResource {
         @GET @Produces("text/plain")
-        public String health() { return "order-capture-service running"; }
+        public String health() { return "Order Capture is Running!!!!"; }
     }
 }

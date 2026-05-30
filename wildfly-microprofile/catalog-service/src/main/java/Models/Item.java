@@ -13,7 +13,7 @@ public class Item {
     private String itemName;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id") //So, product_id is a foreign key in the Item table
     private Product product;
 
     private BigDecimal price;
