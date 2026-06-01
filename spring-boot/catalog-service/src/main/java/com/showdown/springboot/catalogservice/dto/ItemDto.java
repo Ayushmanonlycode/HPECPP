@@ -6,11 +6,11 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 public class ItemDto {
 
-    private UUID id;
+    private String id;
 
     @NotBlank(message = "SKU is required")
     private String sku;
@@ -25,15 +25,15 @@ public class ItemDto {
     private String imageUrl;
 
     @NotNull(message = "Product ID is required")
-    private UUID productId;
+    private String productId;
 
     private String productName;
 
     public ItemDto() {
     }
 
-    public ItemDto(UUID id, String sku, BigDecimal listPrice, String description,
-                   String imageUrl, UUID productId, String productName) {
+    public ItemDto(String id, String sku, BigDecimal listPrice, String description,
+                   String imageUrl, String productId, String productName) {
         this.id = id;
         this.sku = sku;
         this.listPrice = listPrice;
@@ -43,11 +43,11 @@ public class ItemDto {
         this.productName = productName;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -83,11 +83,11 @@ public class ItemDto {
         this.imageUrl = imageUrl;
     }
 
-    public UUID getProductId() {
+    public String getProductId() {
         return productId;
     }
 
-    public void setProductId(UUID productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 
@@ -99,3 +99,4 @@ public class ItemDto {
         this.productName = productName;
     }
 }
+

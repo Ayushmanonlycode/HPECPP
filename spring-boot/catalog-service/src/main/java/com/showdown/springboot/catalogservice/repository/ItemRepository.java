@@ -6,14 +6,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, UUID> {
+public interface ItemRepository extends JpaRepository<Item, String> {
 
-    List<Item> findByProductId(UUID productId);
+    List<Item> findByProductId(String productId);
 
     Optional<Item> findBySku(String sku);
 
     List<Item> findByDescriptionContainingIgnoreCase(String keyword);
 }
+
+

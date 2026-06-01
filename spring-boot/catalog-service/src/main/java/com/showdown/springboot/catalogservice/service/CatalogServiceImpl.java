@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +45,7 @@ public class CatalogServiceImpl implements CatalogService {
 
     @Override
     @Transactional(readOnly = true)
-    public CategoryDto getCategory(UUID id) {
+    public CategoryDto getCategory(String id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", id));
         return toCategoryDto(category);
@@ -59,7 +59,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public CategoryDto updateCategory(UUID id, CategoryDto dto) {
+    public CategoryDto updateCategory(String id, CategoryDto dto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", id));
         category.setName(dto.getName());
@@ -69,7 +69,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public void deleteCategory(UUID id) {
+    public void deleteCategory(String id) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category", id);
         }
@@ -88,7 +88,7 @@ public class CatalogServiceImpl implements CatalogService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductDto> listProductsByCategory(UUID categoryId) {
+    public List<ProductDto> listProductsByCategory(String categoryId) {
         if (!categoryRepository.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", categoryId);
         }
@@ -99,7 +99,7 @@ public class CatalogServiceImpl implements CatalogService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDto getProduct(UUID id) {
+    public ProductDto getProduct(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", id));
         return toProductDto(product);
@@ -115,7 +115,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public ProductDto updateProduct(UUID id, ProductDto dto) {
+    public ProductDto updateProduct(String id, ProductDto dto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", id));
         Category category = categoryRepository.findById(dto.getCategoryId())
@@ -129,7 +129,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public void deleteProduct(UUID id) {
+    public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product", id);
         }
@@ -156,7 +156,7 @@ public class CatalogServiceImpl implements CatalogService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> listItemsByProduct(UUID productId) {
+    public List<ItemDto> listItemsByProduct(String productId) {
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product", productId);
         }
@@ -167,7 +167,7 @@ public class CatalogServiceImpl implements CatalogService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemDto getItem(UUID id) {
+    public ItemDto getItem(String id) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", id));
         return toItemDto(item);
@@ -192,7 +192,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public ItemDto updateItem(UUID id, ItemDto dto) {
+    public ItemDto updateItem(String id, ItemDto dto) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", id));
         Product product = productRepository.findById(dto.getProductId())
@@ -207,7 +207,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public void deleteItem(UUID id) {
+    public void deleteItem(String id) {
         if (!itemRepository.existsById(id)) {
             throw new ResourceNotFoundException("Item", id);
         }
@@ -251,3 +251,4 @@ public class CatalogServiceImpl implements CatalogService {
         );
     }
 }
+

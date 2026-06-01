@@ -1,14 +1,12 @@
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import SearchBar from './SearchBar';
 import './Navbar.css';
 
 export default function Navbar() {
   const { itemCount } = useCartContext();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const handleLogout = () => {
     logout();
@@ -20,9 +18,6 @@ export default function Navbar() {
       <div className="navbar__inner">
         <Link to="/" className="navbar__logo">JPetStore</Link>
 
-        <SearchBar />
-
-
         <div className="navbar__actions">
           <Link to="/cart" className="navbar__icon-btn" aria-label="Cart">
             <CartIcon />
@@ -31,11 +26,14 @@ export default function Navbar() {
             )}
           </Link>
           {user ? (
-            <button className="navbar__icon-btn" onClick={handleLogout} aria-label="Logout">
-              <UserIcon />
-            </button>
+            <div className="navbar__user">
+              <span className="navbar__username">{user.firstName || user.username}</span>
+              <button className="navbar__icon-btn" onClick={handleLogout} aria-label="Logout" title="Logout">
+                <UserIcon />
+              </button>
+            </div>
           ) : (
-            <Link to="/login" className="navbar__icon-btn" aria-label="Sign in">
+            <Link to="/auth" className="navbar__icon-btn" aria-label="Sign in" title="Sign in">
               <UserIcon />
             </Link>
           )}
@@ -57,8 +55,7 @@ function CartIcon() {
 function UserIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
     </svg>
   );
 }

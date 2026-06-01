@@ -33,8 +33,13 @@ export default function CartPage() {
   return (
     <div className="cart-page">
       <div className="cart-page__header">
-        <h1 className="cart-page__title">Your Cart</h1>
-        <p className="cart-page__subtitle">{cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'} in your cart.</p>
+        <h1 className="cart-page__title" style={{ margin: 0, marginBottom: 8 }}>Your Cart</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <p className="cart-page__subtitle" style={{ margin: 0 }}>{cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'} in your cart.</p>
+          <Button variant="primary" size="sm" onClick={() => navigate(-1)}>
+            &larr; Go Back
+          </Button>
+        </div>
       </div>
 
       <div className="cart-page__layout">

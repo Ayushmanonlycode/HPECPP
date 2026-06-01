@@ -11,3 +11,4 @@ public class CatalogServiceApplication extends Application {
         public String health() { return "catalog-service running"; }
     }
 }
+

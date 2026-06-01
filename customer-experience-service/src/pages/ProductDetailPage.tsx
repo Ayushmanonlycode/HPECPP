@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProduct } from '../hooks/useProduct';
 import { useCart } from '../hooks/useCart';
 import { useToast } from '../context/ToastContext';
@@ -9,6 +9,7 @@ import './ProductDetailPage.css';
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { product, items, loading, error } = useProduct(id!);
   const { addItem } = useCart();
   const { showToast } = useToast();
@@ -31,6 +32,11 @@ export default function ProductDetailPage() {
 
   return (
     <div className="container product-detail">
+      <div style={{ marginBottom: 16 }}>
+        <Button variant="secondary" size="sm" onClick={() => navigate(-1)}>
+          &larr; Go Back
+        </Button>
+      </div>
       <div className="product-detail__breadcrumb">
         <Link to="/">Home</Link> &gt; <Link to={`/products?category=${product.categoryName.toLowerCase()}`}>{product.categoryName}</Link> &gt; <span>{product.name}</span>
       </div>

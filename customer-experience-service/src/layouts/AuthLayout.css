@@ -6,7 +6,7 @@
 }
 
 .auth-layout__header {
-  padding: 24px;
+  padding: 24px 32px;
 }
 
 .auth-layout__logo {
@@ -18,17 +18,52 @@
 .auth-layout__main {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px;
+  padding: 16px 24px 40px;
+  overflow-y: auto;
 }
 
 .auth-layout__card {
   width: 100%;
-  max-width: 420px;
-  background: var(--surface-elevated);
+  max-width: 560px;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 40px;
+  padding: 36px 40px;
   box-shadow: var(--shadow-lg);
+  margin: auto 0;
+}
+
+/* Input fields — clearly separated from card background */
+.auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  background: var(--bg);
+  border: 1px solid #2e3545;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input::placeholder {
+  color: var(--text-muted);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 212, 212, 0.15);
+}
+
+/* Label styling */
+.auth-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
 }

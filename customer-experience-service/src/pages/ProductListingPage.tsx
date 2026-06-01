@@ -6,7 +6,7 @@ import EmptyState from '../components/EmptyState';
 
 import { catalogApi } from '../services/catalogApi';
 import { useState, useEffect } from 'react';
-import type { Product } from '../types/api';
+import type { Product, Item } from '../types/api';
 import './HomePage.css'; // Reuse home page layout styles
 
 export default function ProductListingPage() {
@@ -19,6 +19,7 @@ export default function ProductListingPage() {
   // We'll just fetch all and filter in memory if category name is provided,
   // or use the search API if 'q' is provided.
   const [products, setProducts] = useState<Product[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,16 +28,20 @@ export default function ProductListingPage() {
 
     const fetchProducts = async () => {
       try {
-        if (queryStr) {
-          const results = await catalogApi.searchProducts(queryStr);
-          if (!cancelled) setProducts(results);
-        } else {
-          const all = await catalogApi.getProducts();
-          if (!cancelled) {
+        const [results, allItems] = await Promise.all([
+          queryStr ? catalogApi.searchProducts(queryStr) : catalogApi.getProducts(),
+          catalogApi.getItems()
+        ]);
+        
+        if (!cancelled) {
+          setItems(allItems);
+          if (queryStr) {
+            setProducts(results);
+          } else {
             if (categoryStr) {
-              setProducts(all.filter(p => p.categoryName.toLowerCase() === categoryStr.toLowerCase()));
+              setProducts(results.filter(p => p.categoryName.toLowerCase() === categoryStr.toLowerCase()));
             } else {
-              setProducts(all);
+              setProducts(results);
             }
           }
         }
@@ -76,7 +81,7 @@ export default function ProductListingPage() {
         ) : products.length > 0 ? (
           <section className="home-page__grid">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} item={items.find(i => i.productId === product.id)} />
             ))}
           </section>
         ) : (

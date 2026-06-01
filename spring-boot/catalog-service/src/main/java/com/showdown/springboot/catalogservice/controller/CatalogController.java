@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api")
@@ -30,7 +30,7 @@ public class CatalogController {
     }
 
     @GetMapping("/categories/{id}")
-    public ResponseEntity<CategoryDto> getCategory(@PathVariable UUID id) {
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable String id) {
         return ResponseEntity.ok(catalogService.getCategory(id));
     }
 
@@ -41,13 +41,13 @@ public class CatalogController {
     }
 
     @PutMapping("/categories/{id}")
-    public ResponseEntity<CategoryDto> updateCategory(@PathVariable UUID id,
+    public ResponseEntity<CategoryDto> updateCategory(@PathVariable String id,
                                                       @Valid @RequestBody CategoryDto dto) {
         return ResponseEntity.ok(catalogService.updateCategory(id, dto));
     }
 
     @DeleteMapping("/categories/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
         catalogService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
@@ -56,7 +56,7 @@ public class CatalogController {
 
     @GetMapping("/products")
     public ResponseEntity<List<ProductDto>> listProducts(
-            @RequestParam(required = false) UUID categoryId) {
+            @RequestParam(required = false) String categoryId) {
         if (categoryId != null) {
             return ResponseEntity.ok(catalogService.listProductsByCategory(categoryId));
         }
@@ -64,7 +64,7 @@ public class CatalogController {
     }
 
     @GetMapping("/products/{id}")
-    public ResponseEntity<ProductDto> getProduct(@PathVariable UUID id) {
+    public ResponseEntity<ProductDto> getProduct(@PathVariable String id) {
         return ResponseEntity.ok(catalogService.getProduct(id));
     }
 
@@ -75,13 +75,13 @@ public class CatalogController {
     }
 
     @PutMapping("/products/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable UUID id,
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable String id,
                                                     @Valid @RequestBody ProductDto dto) {
         return ResponseEntity.ok(catalogService.updateProduct(id, dto));
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
         catalogService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
@@ -95,7 +95,7 @@ public class CatalogController {
 
     @GetMapping("/items")
     public ResponseEntity<List<ItemDto>> listItems(
-            @RequestParam(required = false) UUID productId) {
+            @RequestParam(required = false) String productId) {
         if (productId != null) {
             return ResponseEntity.ok(catalogService.listItemsByProduct(productId));
         }
@@ -103,7 +103,7 @@ public class CatalogController {
     }
 
     @GetMapping("/items/{id}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable UUID id) {
+    public ResponseEntity<ItemDto> getItem(@PathVariable String id) {
         return ResponseEntity.ok(catalogService.getItem(id));
     }
 
@@ -119,13 +119,13 @@ public class CatalogController {
     }
 
     @PutMapping("/items/{id}")
-    public ResponseEntity<ItemDto> updateItem(@PathVariable UUID id,
+    public ResponseEntity<ItemDto> updateItem(@PathVariable String id,
                                               @Valid @RequestBody ItemDto dto) {
         return ResponseEntity.ok(catalogService.updateItem(id, dto));
     }
 
     @DeleteMapping("/items/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteItem(@PathVariable String id) {
         catalogService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
@@ -135,3 +135,4 @@ public class CatalogController {
         return ResponseEntity.ok(catalogService.searchItems(q));
     }
 }
+

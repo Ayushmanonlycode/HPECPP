@@ -21,11 +21,24 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message =
-      error.response?.data?.message ||
-      error.response?.data ||
-      error.message ||
-      'An unexpected error occurred';
+    let message = 'An unexpected error occurred';
+    
+    if (typeof error.response?.data?.message === 'string') {
+      message = error.response.data.message;
+    } else if (typeof error.response?.data?.error === 'string') {
+      // Handle Spring Boot validation error format
+      if (error.response.data.fieldErrors) {
+        const fields = Object.keys(error.response.data.fieldErrors);
+        message = error.response.data.fieldErrors[fields[0]] || error.response.data.error;
+      } else {
+        message = error.response.data.error;
+      }
+    } else if (typeof error.response?.data === 'string') {
+      message = error.response.data;
+    } else if (typeof error.message === 'string') {
+      message = error.message;
+    }
+
     return Promise.reject({ message, status: error.response?.status ?? 0 });
   }
 );

@@ -8,8 +8,8 @@ import heroDogImg from '../assets/hero-dog.png';
 import './HomePage.css';
 
 export default function HomePage() {
-  const { products, loading } = useProducts();
-  const featuredDogs = products.filter(p => p.categoryId === 'cat-dogs').slice(0, 4);
+  const { products, items, loading } = useProducts();
+  const featuredDogs = products.filter(p => p.categoryName === 'Dogs').slice(0, 4);
 
   return (
     <div className="home-page">
@@ -17,17 +17,6 @@ export default function HomePage() {
       {/* ── Sidebar ─────────────────────────────────────── */}
       <aside className="home-page__sidebar">
         <CategoryNav />
-        <div className="home-page__sidebar-footer">
-          <Link to="/help" className="home-page__sidebar-link">
-            <HelpIcon /> Help
-          </Link>
-          <Link to="/settings" className="home-page__sidebar-link">
-            <SettingsIcon /> Settings
-          </Link>
-          <Link to="/login" className="home-page__sidebar-btn">
-            Sign In
-          </Link>
-        </div>
       </aside>
 
       {/* ── Main ────────────────────────────────────────── */}
@@ -37,16 +26,13 @@ export default function HomePage() {
             <h1 className="home-page__title">Featured Dogs</h1>
             <p className="home-page__subtitle">Premium companions for your high-tech lifestyle.</p>
           </div>
-          <Button variant="secondary" size="sm">
-            <FilterIcon /> Filter
-          </Button>
         </header>
 
         <section className="home-page__grid">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
             : featuredDogs.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} item={items.find(i => i.productId === product.id)} />
               ))
           }
         </section>
@@ -87,10 +73,3 @@ function SettingsIcon() {
   );
 }
 
-function FilterIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-    </svg>
-  );
-}

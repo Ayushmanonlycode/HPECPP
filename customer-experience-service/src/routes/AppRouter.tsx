@@ -11,16 +11,33 @@ import CartPage from '../pages/CartPage';
 import CheckoutPage from '../pages/CheckoutPage';
 import OrderConfirmationPage from '../pages/OrderConfirmationPage';
 import OrderHistoryPage from '../pages/OrderHistoryPage';
-import LoginPage from '../pages/LoginPage';
+import AuthPage from '../pages/AuthPage';
 import ProfilePage from '../pages/ProfilePage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 // Simple wrapper to protect routes (auth required)
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  const location = useLocation();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+  }
+  return children;
+}
+
+// Redirect already-logged-in users away from auth page
+function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  if (isAuthenticated) {
+    const rawFrom = location.state?.from;
+    const from = (typeof rawFrom === 'string' && rawFrom.startsWith('/') && rawFrom !== '/auth') ? rawFrom : '/';
+    return <Navigate to={from} replace />;
+  }
   return children;
 }
 
@@ -53,7 +70,8 @@ export default function AppRouter() {
 
         {/* Auth layout (no nav/footer) */}
         <Route element={<AuthLayout />}>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth" element={<PublicOnlyRoute><AuthPage /></PublicOnlyRoute>} />
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

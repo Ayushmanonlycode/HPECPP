@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { UserProfile } from '../types/api';
 
 interface AuthState {
@@ -11,22 +11,28 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-const GUEST_ID = 'guest-' + Math.random().toString(36).slice(2, 10);
+// Generate a stable guest ID (persisted in localStorage)
+function getOrCreateGuestId(): string {
+  let guestId = localStorage.getItem('guestId');
+  if (!guestId) {
+    guestId = 'guest-' + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem('guestId', guestId);
+  }
+  return guestId;
+}
+
+// Restore user synchronously so ProtectedRoute never sees a false unauthenticated state
+function restoreUser(): UserProfile | null {
+  try {
+    const stored = localStorage.getItem('user');
+    if (stored) return JSON.parse(stored);
+  } catch { /* ignore */ }
+  return null;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-
-  // Restore session from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      try { setUser(JSON.parse(stored)); } catch { /* ignore */ }
-    }
-    // Ensure a userId always exists for cart operations
-    if (!localStorage.getItem('userId')) {
-      localStorage.setItem('userId', GUEST_ID);
-    }
-  }, []);
+  // Initialize synchronously from localStorage — no useEffect delay
+  const [user, setUser] = useState<UserProfile | null>(restoreUser);
 
   const login = (profile: UserProfile) => {
     setUser(profile);
@@ -37,10 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    localStorage.setItem('userId', GUEST_ID);
+    localStorage.removeItem('userId');
   };
 
-  const userId = user?.id ?? localStorage.getItem('userId') ?? GUEST_ID;
+  const userId = user?.id ?? localStorage.getItem('userId') ?? getOrCreateGuestId();
 
   return (
     <AuthContext.Provider value={{ user, userId, isAuthenticated: !!user, login, logout }}>

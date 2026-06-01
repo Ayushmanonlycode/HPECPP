@@ -12,9 +12,7 @@ export default function CartItem({ item, categoryName, onRemove, onUpdateQuantit
   return (
     <div className="cart-item">
       <div className="cart-item__image">
-        <div className="cart-item__image-placeholder">
-          <PawIcon />
-        </div>
+        <img src={`/images/${item.itemSku}.png`} alt={item.productName} className="cart-item__img" />
       </div>
 
       <div className="cart-item__content">

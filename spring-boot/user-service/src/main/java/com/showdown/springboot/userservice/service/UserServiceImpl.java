@@ -103,6 +103,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserProfileDto partialUpdateProfile(UUID id, com.showdown.springboot.userservice.dto.UserProfileUpdateDto dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+
+        if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null) user.setLastName(dto.getLastName());
+        if (dto.getPhone() != null) user.setPhone(dto.getPhone());
+        if (dto.getAddress() != null) user.setAddress(dto.getAddress());
+        if (dto.getCity() != null) user.setCity(dto.getCity());
+        if (dto.getState() != null) user.setState(dto.getState());
+        if (dto.getZip() != null) user.setZip(dto.getZip());
+        if (dto.getCountry() != null) user.setCountry(dto.getCountry());
+
+        User saved = userRepository.save(user);
+        return toProfileDto(saved);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<UserProfileDto> listUsers() {
         return userRepository.findAll().stream()

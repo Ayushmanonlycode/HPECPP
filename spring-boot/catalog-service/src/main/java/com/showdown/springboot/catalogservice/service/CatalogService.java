@@ -5,50 +5,51 @@ import com.showdown.springboot.catalogservice.dto.ItemDto;
 import com.showdown.springboot.catalogservice.dto.ProductDto;
 
 import java.util.List;
-import java.util.UUID;
+
 
 public interface CatalogService {
 
     // ── Categories ───────────────────────────────────────────────
     List<CategoryDto> listCategories();
 
-    CategoryDto getCategory(UUID id);
+    CategoryDto getCategory(String id);
 
     CategoryDto createCategory(CategoryDto dto);
 
-    CategoryDto updateCategory(UUID id, CategoryDto dto);
+    CategoryDto updateCategory(String id, CategoryDto dto);
 
-    void deleteCategory(UUID id);
+    void deleteCategory(String id);
 
     // ── Products ─────────────────────────────────────────────────
     List<ProductDto> listProducts();
 
-    List<ProductDto> listProductsByCategory(UUID categoryId);
+    List<ProductDto> listProductsByCategory(String categoryId);
 
-    ProductDto getProduct(UUID id);
+    ProductDto getProduct(String id);
 
     ProductDto createProduct(ProductDto dto);
 
-    ProductDto updateProduct(UUID id, ProductDto dto);
+    ProductDto updateProduct(String id, ProductDto dto);
 
-    void deleteProduct(UUID id);
+    void deleteProduct(String id);
 
     List<ProductDto> searchProducts(String keyword);
 
     // ── Items ────────────────────────────────────────────────────
     List<ItemDto> listItems();
 
-    List<ItemDto> listItemsByProduct(UUID productId);
+    List<ItemDto> listItemsByProduct(String productId);
 
-    ItemDto getItem(UUID id);
+    ItemDto getItem(String id);
 
     ItemDto getItemBySku(String sku);
 
     ItemDto createItem(ItemDto dto);
 
-    ItemDto updateItem(UUID id, ItemDto dto);
+    ItemDto updateItem(String id, ItemDto dto);
 
-    void deleteItem(UUID id);
+    void deleteItem(String id);
 
     List<ItemDto> searchItems(String keyword);
 }
+
