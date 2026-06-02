@@ -50,6 +50,12 @@ public class UserController {
         return ResponseEntity.ok(userService.updateProfile(id, dto));
     }
 
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<UserProfileDto> partialUpdateProfile(@PathVariable UUID id,
+                                                               @Valid @RequestBody com.showdown.springboot.userservice.dto.UserProfileUpdateDto dto) {
+        return ResponseEntity.ok(userService.partialUpdateProfile(id, dto));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);

@@ -2,15 +2,14 @@ package com.showdown.springboot.catalogservice.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "items")
 public class Item {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String sku;
@@ -38,11 +37,11 @@ public class Item {
         this.product = product;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -86,3 +85,5 @@ public class Item {
         this.product = product;
     }
 }
+
+

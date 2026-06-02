@@ -4,11 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.UUID;
+
 
 public class ProductDto {
 
-    private UUID id;
+    private String id;
 
     @NotBlank(message = "Product name is required")
     @Size(max = 255, message = "Product name must be at most 255 characters")
@@ -20,15 +20,15 @@ public class ProductDto {
     private String species;
 
     @NotNull(message = "Category ID is required")
-    private UUID categoryId;
+    private String categoryId;
 
     private String categoryName;
 
     public ProductDto() {
     }
 
-    public ProductDto(UUID id, String name, String description, String species,
-                      UUID categoryId, String categoryName) {
+    public ProductDto(String id, String name, String description, String species,
+                      String categoryId, String categoryName) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,11 +37,11 @@ public class ProductDto {
         this.categoryName = categoryName;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -69,11 +69,11 @@ public class ProductDto {
         this.species = species;
     }
 
-    public UUID getCategoryId() {
+    public String getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(UUID categoryId) {
+    public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -85,3 +85,4 @@ public class ProductDto {
         this.categoryName = categoryName;
     }
 }
+

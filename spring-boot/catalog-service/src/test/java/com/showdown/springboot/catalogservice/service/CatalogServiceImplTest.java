@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,7 +51,7 @@ public class CatalogServiceImplTest {
     @Test
     void listCategories_shouldReturnCategoryDtoList() {
         Category category = new Category("Dogs", "All kinds of dogs");
-        category.setId(UUID.randomUUID());
+        category.setId(java.util.UUID.randomUUID().toString());
         
         when(categoryRepository.findAll()).thenReturn(List.of(category));
 
@@ -65,7 +65,7 @@ public class CatalogServiceImplTest {
 
     @Test
     void getCategory_whenExists_shouldReturnCategoryDto() {
-        UUID id = UUID.randomUUID();
+        String id = java.util.UUID.randomUUID().toString();
         Category category = new Category("Cats", "Feline friends");
         category.setId(id);
 
@@ -80,7 +80,7 @@ public class CatalogServiceImplTest {
 
     @Test
     void getCategory_whenNotExists_shouldThrowResourceNotFoundException() {
-        UUID id = UUID.randomUUID();
+        String id = java.util.UUID.randomUUID().toString();
         when(categoryRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> catalogService.getCategory(id))
@@ -92,7 +92,7 @@ public class CatalogServiceImplTest {
     void createCategory_shouldSaveAndReturnCategoryDto() {
         CategoryDto dto = new CategoryDto(null, "Birds", "Feathered pets");
         Category savedCategory = new Category("Birds", "Feathered pets");
-        savedCategory.setId(UUID.randomUUID());
+        savedCategory.setId(java.util.UUID.randomUUID().toString());
 
         when(categoryRepository.save(any(Category.class))).thenReturn(savedCategory);
 
@@ -107,11 +107,11 @@ public class CatalogServiceImplTest {
 
     @Test
     void listProductsByCategory_whenCategoryExists_shouldReturnProducts() {
-        UUID categoryId = UUID.randomUUID();
+        String categoryId = java.util.UUID.randomUUID().toString();
         Category category = new Category("Dogs", "Dogs description");
         category.setId(categoryId);
         Product product = new Product("Golden Retriever", "Friendly dog", "Canis", category);
-        product.setId(UUID.randomUUID());
+        product.setId(java.util.UUID.randomUUID().toString());
 
         when(categoryRepository.existsById(categoryId)).thenReturn(true);
         when(productRepository.findByCategoryId(categoryId)).thenReturn(List.of(product));
@@ -124,7 +124,7 @@ public class CatalogServiceImplTest {
 
     @Test
     void listProductsByCategory_whenCategoryDoesNotExist_shouldThrowException() {
-        UUID categoryId = UUID.randomUUID();
+        String categoryId = java.util.UUID.randomUUID().toString();
         when(categoryRepository.existsById(categoryId)).thenReturn(false);
 
         assertThatThrownBy(() -> catalogService.listProductsByCategory(categoryId))
@@ -133,13 +133,13 @@ public class CatalogServiceImplTest {
 
     @Test
     void createProduct_whenCategoryExists_shouldSaveProduct() {
-        UUID categoryId = UUID.randomUUID();
+        String categoryId = java.util.UUID.randomUUID().toString();
         Category category = new Category("Dogs", "Dogs description");
         category.setId(categoryId);
         ProductDto dto = new ProductDto(null, "Pug", "Cute pug", "Canis", categoryId, "Dogs");
         
         Product savedProduct = new Product("Pug", "Cute pug", "Canis", category);
-        savedProduct.setId(UUID.randomUUID());
+        savedProduct.setId(java.util.UUID.randomUUID().toString());
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
@@ -156,11 +156,11 @@ public class CatalogServiceImplTest {
     @Test
     void getItemBySku_whenExists_shouldReturnItemDto() {
         Category category = new Category("Dogs", "Dogs");
-        category.setId(UUID.randomUUID());
+        category.setId(java.util.UUID.randomUUID().toString());
         Product product = new Product("Poodle", "Smart dog", "Canis", category);
-        product.setId(UUID.randomUUID());
+        product.setId(java.util.UUID.randomUUID().toString());
         Item item = new Item("EST-101", new BigDecimal("99.99"), "Toy Poodle", "poodle.jpg", product);
-        item.setId(UUID.randomUUID());
+        item.setId(java.util.UUID.randomUUID().toString());
 
         when(itemRepository.findBySku("EST-101")).thenReturn(Optional.of(item));
 
@@ -172,3 +172,5 @@ public class CatalogServiceImplTest {
         assertThat(result.getProductName()).isEqualTo("Poodle");
     }
 }
+
+
