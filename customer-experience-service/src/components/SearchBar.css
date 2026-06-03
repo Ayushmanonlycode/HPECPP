@@ -1,31 +1,36 @@
+/* ── Search Bar ─────────────────────────────────────────── */
 .search-bar {
-  display: flex;
-  align-items: center;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 0 14px;
-  gap: 8px;
-  flex: 1;
-  max-width: 340px;
-  height: 36px;
-}
-
-.search-bar__icon {
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+  position: relative;
+  width: 100%;
+  max-width: 280px;
 }
 
 .search-bar__input {
-  background: none;
-  border: none;
-  outline: none;
-  color: var(--text-primary);
-  font-size: 0.875rem;
   width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
 }
 
-.search-bar__input::placeholder { color: var(--text-muted); }
-.search-bar__input::-webkit-search-cancel-button { display: none; }
+.search-bar__input:focus {
+  border-bottom-color: var(--text-primary);
+}
+
+.search-bar__input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.search-bar__icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}

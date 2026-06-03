@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCartContext } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import SearchBar from './SearchBar';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -18,7 +19,16 @@ export default function Navbar() {
       <div className="navbar__inner">
         <Link to="/" className="navbar__logo">JPetStore</Link>
 
+        <nav className="navbar__nav">
+          <Link to="/products" className="navbar__nav-link">Shop</Link>
+          <Link to="/products?category=dogs" className="navbar__nav-link">Dogs</Link>
+          <Link to="/products?category=cats" className="navbar__nav-link">Cats</Link>
+          <Link to="/products?category=fish" className="navbar__nav-link">Fish</Link>
+          <Link to="/products?category=birds" className="navbar__nav-link">Birds</Link>
+        </nav>
+
         <div className="navbar__actions">
+          <SearchBar />
           <Link to="/cart" className="navbar__icon-btn" aria-label="Cart">
             <CartIcon />
             {itemCount > 0 && (
@@ -45,16 +55,15 @@ export default function Navbar() {
 
 function CartIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
     </svg>
   );
 }
 
 function UserIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
     </svg>
   );

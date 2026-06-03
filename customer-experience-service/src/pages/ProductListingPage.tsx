@@ -1,5 +1,4 @@
 import { useSearchParams } from 'react-router-dom';
-import CategoryNav from '../components/CategoryNav';
 import ProductCard from '../components/ProductCard';
 import SkeletonCard from '../components/SkeletonCard';
 import EmptyState from '../components/EmptyState';
@@ -14,10 +13,6 @@ export default function ProductListingPage() {
   const categoryStr = searchParams.get('category');
   const queryStr = searchParams.get('q');
 
-  // We need to map category name to categoryId if filtering by category,
-  // but for simplicity in this mock scaffold, the useProducts hook takes categoryId.
-  // We'll just fetch all and filter in memory if category name is provided,
-  // or use the search API if 'q' is provided.
   const [products, setProducts] = useState<Product[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,12 +55,8 @@ export default function ProductListingPage() {
 
   return (
     <div className="home-page">
-      <aside className="home-page__sidebar">
-        <CategoryNav />
-      </aside>
-
-      <div className="home-page__main" style={{ overflowY: 'auto' }}>
-        <header className="home-page__header">
+      <div className="home-page__main">
+        <header className="home-page__header" style={{ paddingTop: '48px' }}>
           <div>
             <h1 className="home-page__title">{title}</h1>
             <p className="home-page__subtitle">
@@ -76,7 +67,7 @@ export default function ProductListingPage() {
 
         {loading ? (
           <section className="home-page__grid">
-            {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
           </section>
         ) : products.length > 0 ? (
           <section className="home-page__grid">
@@ -94,3 +85,4 @@ export default function ProductListingPage() {
     </div>
   );
 }
+

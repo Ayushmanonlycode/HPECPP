@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { Cart, AddToCartRequest, CartItem } from '../types/api';
+import type { Cart, AddToCartRequest } from '../types/api';
 import { cartApi } from '../services/cartApi';
 import { useAuth } from './AuthContext';
 
@@ -29,7 +29,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try { return JSON.parse(stored); } catch { /* ignore */ }
     }
-    return { items: [], itemCount: 0, total: 0 };
+    return { userId: userId || 'guest', items: [], itemCount: 0, total: 0 };
   };
 
   const saveGuestCart = (newCart: Cart) => {

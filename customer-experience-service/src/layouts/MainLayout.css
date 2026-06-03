@@ -1,13 +1,10 @@
 .main-layout {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .main-layout__content {
   flex: 1;
-  min-height: 0;       /* critical: lets flex child shrink below content size */
   width: 100%;
-  overflow: hidden;
 }

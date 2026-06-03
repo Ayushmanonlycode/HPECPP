@@ -82,31 +82,33 @@ export default function AuthPage() {
 
   const tabBtn = (active: boolean) => ({
     flex: 1,
-    padding: '12px 0',
+    padding: '16px 0',
     background: 'none',
     border: 'none',
-    borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
+    borderBottom: active ? '1px solid var(--text-primary)' : '1px solid transparent',
     color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-    fontWeight: active ? 600 : 400,
+    fontWeight: active ? 600 : 500,
     cursor: 'pointer',
-    fontSize: '1rem',
+    fontSize: '0.75rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.08em',
     transition: 'all 0.2s',
   } as React.CSSProperties);
 
   return (
     <div style={{ width: '100%' }}>
       {/* Tab switcher */}
-      <div style={{ display: 'flex', marginBottom: 28, borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', marginBottom: 32, borderBottom: '1px solid var(--border)' }}>
         <button onClick={() => { setTab('login'); setError(null); }} style={tabBtn(tab === 'login')}>
           Login
         </button>
         <button onClick={() => { setTab('signup'); setError(null); }} style={tabBtn(tab === 'signup')}>
-          Sign Up
+          Create Account
         </button>
       </div>
 
       {error && (
-        <div style={{ padding: '10px 14px', marginBottom: 20, background: 'var(--error-bg)', color: 'var(--error)', borderRadius: 'var(--radius-sm)', fontSize: '0.875rem', border: '1px solid rgba(239,68,68,0.2)' }}>
+        <div style={{ padding: '12px 16px', marginBottom: 24, background: 'var(--error-bg)', color: 'var(--error)', border: '1px solid var(--border)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           {error}
         </div>
       )}
