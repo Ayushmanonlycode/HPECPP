@@ -51,13 +51,7 @@ export default function CartItem({ item, categoryName, onRemove, onUpdateQuantit
   );
 }
 
-function PawIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" opacity="0.2">
-      <path d="M11 6.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM7.5 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm9 0a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm-7 7c-2 0-6 1.5-6 5s3.5 5 6 5 6-1.5 6-5-4-5-6-5Z"/>
-    </svg>
-  );
-}
+
 
 function TrashIcon() {
   return (

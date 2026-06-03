@@ -85,10 +85,11 @@ export default function CheckoutPage() {
     }
   };
 
-  const subtotal = cart.total;
+  const subtotal = cart?.total ?? 0;
   const shipping = 15.00;
   const tax = subtotal * 0.085;
   const total = subtotal + shipping + tax;
+
 
   return (
     <div className="checkout-page">
@@ -157,7 +158,7 @@ export default function CheckoutPage() {
             <h2 className="checkout-page__review-title">Order Review</h2>
             
             <div style={{ marginBottom: 24 }}>
-              {cart.items.map(item => (
+              {cart?.items.map(item => (
                 <div key={item.itemSku} className="checkout-page__review-item">
                   <span className="checkout-page__review-item-name">{item.quantity}x {item.productName}</span>
                   <span>${Number(item.subtotal).toFixed(2)}</span>
