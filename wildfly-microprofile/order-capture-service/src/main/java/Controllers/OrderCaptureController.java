@@ -1,13 +1,14 @@
 package Controllers;
 
 import Models.Dto.OrderDto;
+import Models.Dto.OrderResponseDto;
 import Service.OrderCaptureService;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.List;
 
 @Path("/order")
 public class OrderCaptureController {
@@ -28,6 +29,32 @@ public class OrderCaptureController {
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity("Failed to place order")
                 .build();
+
+    }
+
+
+    @GET
+    @Path("/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<OrderResponseDto> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
+
+    @GET
+    @Path("/search/cid")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<OrderResponseDto> searchByCid(@QueryParam("cid") String cid) {
+        return orderService.getByCid(cid);
+
+    }
+
+
+    @GET
+    @Path("/search/oid")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<OrderResponseDto> searchByOid(@QueryParam("oid") String oid) {
+        return orderService.getByOid(oid);
 
     }
 }
