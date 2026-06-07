@@ -1,5 +1,6 @@
 package com.showdown.springboot.userservice.service;
 
+import com.showdown.springboot.userservice.dto.AuthResponseDto;
 import com.showdown.springboot.userservice.dto.UserLoginDto;
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserRegistrationDto;
@@ -7,6 +8,8 @@ import com.showdown.springboot.userservice.entity.User;
 import com.showdown.springboot.userservice.exception.DuplicateResourceException;
 import com.showdown.springboot.userservice.exception.ResourceNotFoundException;
 import com.showdown.springboot.userservice.repository.UserRepository;
+import com.showdown.springboot.userservice.security.JwtTokenProvider;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +22,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -36,7 +43,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword()); // plain-text for demo
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setPhone(dto.getPhone());
@@ -52,15 +59,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserProfileDto login(UserLoginDto dto) {
+    public AuthResponseDto login(UserLoginDto dto) {
         User user = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
 
-        if (!user.getPassword().equals(dto.getPassword())) {
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        return toProfileDto(user);
+        String token = jwtTokenProvider.generateToken(user.getUsername());
+        return new AuthResponseDto(token, toProfileDto(user));
     }
 
     @Override
@@ -88,7 +96,7 @@ public class UserServiceImpl implements UserService {
 
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setPhone(dto.getPhone());

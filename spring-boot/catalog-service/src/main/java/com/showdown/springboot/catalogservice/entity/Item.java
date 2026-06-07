@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class Item {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false, unique = true)

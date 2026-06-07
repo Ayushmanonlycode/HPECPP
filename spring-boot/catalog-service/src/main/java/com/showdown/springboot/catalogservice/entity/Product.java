@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 public class Product {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false)

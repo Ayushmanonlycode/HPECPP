@@ -1,5 +1,6 @@
 package com.showdown.springboot.userservice.service;
 
+import com.showdown.springboot.userservice.dto.AuthResponseDto;
 import com.showdown.springboot.userservice.dto.UserLoginDto;
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserProfileUpdateDto;
@@ -12,7 +13,7 @@ public interface UserService {
 
     UserProfileDto register(UserRegistrationDto dto);
 
-    UserProfileDto login(UserLoginDto dto);
+    AuthResponseDto login(UserLoginDto dto);
 
     UserProfileDto getProfile(UUID id);
 

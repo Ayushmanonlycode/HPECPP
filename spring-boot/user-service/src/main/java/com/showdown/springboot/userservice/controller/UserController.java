@@ -1,5 +1,6 @@
 package com.showdown.springboot.userservice.controller;
 
+import com.showdown.springboot.userservice.dto.AuthResponseDto;
 import com.showdown.springboot.userservice.dto.UserLoginDto;
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserRegistrationDto;
@@ -29,9 +30,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserProfileDto> login(@Valid @RequestBody UserLoginDto dto) {
-        UserProfileDto profile = userService.login(dto);
-        return ResponseEntity.ok(profile);
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginDto dto) {
+        AuthResponseDto authResponse = userService.login(dto);
+        return ResponseEntity.ok(authResponse);
     }
 
     @GetMapping
