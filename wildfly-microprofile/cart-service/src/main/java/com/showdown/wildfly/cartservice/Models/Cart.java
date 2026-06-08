@@ -1,21 +1,15 @@
 package com.showdown.wildfly.cartservice.Models;
 
-import jakarta.persistence.Transient;
-import jakarta.persistence.*;
 import java.util.List;
 
-@Entity
 public class Cart {
 
-    @Id
     private String cartId;
 
     private String userId;
 
     private double totalAmount;
 
-    //@OneToMany(mappedBy = "cart")
-    @Transient
     private List<CartItem> items;
 
     public String getCartId() {

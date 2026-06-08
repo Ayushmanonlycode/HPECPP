@@ -1,12 +1,7 @@
 package com.showdown.wildfly.cartservice.Models;
 
-import jakarta.persistence.*;
-//import jakarta.json.bind.annotation.JsonbTransient;
-
-@Entity
 public class CartItem {
 
-    @Id
     private String itemId;
 
     private String sku;
@@ -17,8 +12,6 @@ public class CartItem {
 
     private double price;
 
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     public String getItemId() {
