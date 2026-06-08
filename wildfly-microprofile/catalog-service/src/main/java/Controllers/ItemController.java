@@ -11,20 +11,12 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/item")
+@Path("/items")
 public class ItemController {
 
     @Inject
     ItemService itemService;
 
-    @GET
-    @Path("/all")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<ItemDto> getItems() {
-
-        return itemService.getItems();
-
-    }
 
 
     @GET
@@ -35,9 +27,11 @@ public class ItemController {
     }
 
     @GET
-    @Path("/search/productId")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ItemDto> getItemsByProductId(@QueryParam("pid") String pid) {
+    public List<ItemDto> getItemsByProductId(@QueryParam("productId") String pid) {
+        if(pid == null){
+            return itemService.getItems();
+        }
         return itemService.getItemsByProductId(pid);
     }
 

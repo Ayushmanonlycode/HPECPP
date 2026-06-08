@@ -34,22 +34,11 @@ public class ProductRepo {
                 .toList();
     }
 
-    public List<ProductDto> getProductsbyId(String id) {
+    public Product getProductsbyId(String id) {
         return em.createQuery("SELECT p FROM Product p WHERE p.id = :id", Product.class)
                 .setParameter("id", id)
-                .getResultList()
-                .stream()
-                .map(p -> {
-                    ProductDto dto = new ProductDto();
-                    dto.setId(p.getId());
-                    dto.setName(p.getName());
-                    dto.setAvailability(p.getAvailability());
-                    if (p.getCategory() != null) {
-                        dto.setCategoryId(p.getCategory().getId());
-                    }
-                    return dto;
-                })
-                .toList();
+                .getSingleResult();
+
     }
 
     public List<ProductDto> getProductsbyCategory(String categoryId) {
@@ -89,5 +78,23 @@ public class ProductRepo {
         } catch (PersistenceException e) {
             return 1;
         }
+    }
+
+    public List<ProductDto> getProductsByName(String name) {
+        return em.createQuery("SELECT p FROM Product p WHERE p.name = :Name", Product.class)
+                .setParameter("Name", name)
+                .getResultList()
+                .stream()
+                .map(p -> {
+                    ProductDto dto = new ProductDto();
+                    dto.setId(p.getId());
+                    dto.setName(p.getName());
+                    dto.setAvailability(p.getAvailability());
+                    if (p.getCategory() != null) {
+                        dto.setCategoryId(p.getCategory().getId());
+                    }
+                    return dto;
+                })
+                .toList();
     }
 }

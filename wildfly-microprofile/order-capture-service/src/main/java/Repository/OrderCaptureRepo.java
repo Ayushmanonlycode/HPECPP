@@ -45,12 +45,11 @@ public class OrderCaptureRepo {
 
     }
 
-    public List<Orders> getByOid(String oid) {
+    public Orders getByOid(String oid) {
         return em.createQuery(
                         "SELECT o FROM Orders o WHERE o.orderId = :orderId",
                         Orders.class
                 )
-                .setParameter("orderId", oid)
-                .getResultList();
+                .setParameter("orderId", oid).getSingleResult();
     }
 }

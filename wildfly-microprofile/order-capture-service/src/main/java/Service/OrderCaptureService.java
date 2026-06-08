@@ -127,37 +127,34 @@ public class OrderCaptureService {
 
 
     @Transactional
-    public List<OrderResponseDto> getByOid(String oid) {
-        List<Orders> orders= orderRepo.getByOid(oid);
+    public OrderResponseDto getByOid(String oid) {
+        Orders order= orderRepo.getByOid(oid);
 
+        OrderResponseDto dto = new OrderResponseDto();
 
-        return orders.stream().map(order -> {
-            OrderResponseDto dto = new OrderResponseDto();
+        dto.setOrderId(order.getOrderId());
+        dto.setCustomerId(order.getCustomerId());
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setStatus(order.getStatus());
 
-            dto.setOrderId(order.getOrderId());
-            dto.setCustomerId(order.getCustomerId());
-            dto.setTotalAmount(order.getTotalAmount());
-            dto.setCreatedAt(order.getCreatedAt());
-            dto.setStatus(order.getStatus());
+        List<LineItemDto> lineItemDtos =
+                order.getLineItems()
+                        .stream()
+                        .map(item -> {
 
-            List<LineItemDto> lineItemDtos =
-                    order.getLineItems()
-                            .stream()
-                            .map(item -> {
+                            LineItemDto itemDto = new LineItemDto();
 
-                                LineItemDto itemDto = new LineItemDto();
+                            itemDto.setItemId(item.getItemId());
+                            itemDto.setQuantity(item.getQuantity());
+                            itemDto.setUnitPrice(item.getUnitPrice());
 
-                                itemDto.setItemId(item.getItemId());
-                                itemDto.setQuantity(item.getQuantity());
-                                itemDto.setUnitPrice(item.getUnitPrice());
+                            return itemDto;
+                        })
+                        .toList();
 
-                                return itemDto;
-                            })
-                            .toList();
+        dto.setLineItems(lineItemDtos);
 
-            dto.setLineItems(lineItemDtos);
-
-            return dto;
-        }).toList();
+        return dto;
     }
 }

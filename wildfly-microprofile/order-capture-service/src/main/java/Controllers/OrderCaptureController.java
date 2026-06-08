@@ -10,14 +10,13 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/order")
+@Path("/orders")
 public class OrderCaptureController {
 
     @Inject
     OrderCaptureService orderService;
 
     @POST
-    @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response placeOrder(OrderDto orderDto) {
         int res= orderService.placeOrder(orderDto);
@@ -34,27 +33,29 @@ public class OrderCaptureController {
 
 
     @GET
-    @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List<OrderResponseDto> getAllOrders() {
         return orderService.getAllOrders();
     }
 
 
+
+
     @GET
-    @Path("/search/cid")
+    @Path("/user/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<OrderResponseDto> searchByCid(@QueryParam("cid") String cid) {
-        return orderService.getByCid(cid);
+    public List<OrderResponseDto> getUserOrders(
+            @PathParam("userId") String userId) {
+        return orderService.getByCid(userId);
 
     }
 
 
     @GET
-    @Path("/search/oid")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<OrderResponseDto> searchByOid(@QueryParam("oid") String oid) {
-        return orderService.getByOid(oid);
+    @Path("/{id}")
+    public OrderResponseDto getOrder(@PathParam("id") String id) {
+        return orderService.getByOid(id);
 
     }
 }
