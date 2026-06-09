@@ -1,15 +1,14 @@
 package com.showdown.wildfly.cartservice.Models;
 
 import java.util.List;
-
+import java.math.BigDecimal;
 public class Cart {
 
     private String cartId;
 
     private String userId;
 
-    private double totalAmount;
-
+    private BigDecimal totalAmount;
     private List<CartItem> items;
 
     public String getCartId() {
@@ -28,11 +27,11 @@ public class Cart {
         this.userId = userId;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 

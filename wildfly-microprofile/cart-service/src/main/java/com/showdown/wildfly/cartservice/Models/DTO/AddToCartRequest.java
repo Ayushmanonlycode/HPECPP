@@ -1,11 +1,13 @@
 package com.showdown.wildfly.cartservice.Models.DTO;
 
+import java.math.BigDecimal;
+
 public class AddToCartRequest {
 
     private String itemSku;
     private String productName;
     private int quantity;
-    private double unitPrice;
+    private BigDecimal unitPrice;
 
     public String getItemSku() {
         return itemSku;
@@ -31,11 +33,11 @@ public class AddToCartRequest {
         this.quantity = quantity;
     }
 
-    public double getUnitPrice() {
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(double unitPrice) {
+    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
 }

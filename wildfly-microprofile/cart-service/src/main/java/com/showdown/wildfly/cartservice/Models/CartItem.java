@@ -1,5 +1,6 @@
 package com.showdown.wildfly.cartservice.Models;
 import jakarta.json.bind.annotation.JsonbTransient;
+import java.math.BigDecimal;
 public class CartItem {
 
     private String itemId;
@@ -10,7 +11,7 @@ public class CartItem {
 
     private int quantity;
 
-    private double price;
+    private BigDecimal price;
 
     @jakarta.json.bind.annotation.JsonbTransient
     private Cart cart;
@@ -47,11 +48,11 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

@@ -16,7 +16,8 @@
     import redis.clients.jedis.JedisPool;
     import redis.clients.jedis.exceptions.JedisException;
 
-    import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.ArrayList;
     import java.util.Set;
     import java.util.logging.Logger;
 
@@ -166,11 +167,19 @@
         }
         private void recalculateTotal(Cart cart) {
 
-            double total = 0;
+            BigDecimal total = BigDecimal.ZERO;
 
             if (cart.getItems() != null) {
                 for (CartItem item : cart.getItems()) {
-                    total += item.getPrice() * item.getQuantity();
+
+                    if (item.getPrice() != null) {
+
+                        total = total.add(
+                            item.getPrice().multiply(
+                                BigDecimal.valueOf(item.getQuantity())
+                            )
+                        );
+                    }
                 }
             }
 

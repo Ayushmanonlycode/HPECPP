@@ -6,6 +6,8 @@ import com.showdown.wildfly.cartservice.Repository.CartRepository;
 
 import com.showdown.wildfly.cartservice.Models.DTO.CartResponse;
 import com.showdown.wildfly.cartservice.Models.DTO.CartItemResponse;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -73,7 +75,8 @@ public class CartService {
                 dto.setQuantity(item.getQuantity());
                 dto.setUnitPrice(item.getPrice());
                 dto.setSubtotal(
-                        item.getPrice() * item.getQuantity());
+                    item.getPrice().multiply(
+                            BigDecimal.valueOf(item.getQuantity())));
 
                 itemCount += item.getQuantity();
 

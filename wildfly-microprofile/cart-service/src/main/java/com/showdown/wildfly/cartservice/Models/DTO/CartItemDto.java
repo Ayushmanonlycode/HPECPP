@@ -1,12 +1,14 @@
 package com.showdown.wildfly.cartservice.Models.DTO;
 
+import java.math.BigDecimal;
+
 public class CartItemDto {
 
     private String itemId;
     private String sku;
     private String productName;
     private int quantity;
-    private double price;
+    private BigDecimal price;
 
     public String getItemId() {
         return itemId;
@@ -40,11 +42,11 @@ public class CartItemDto {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 }
