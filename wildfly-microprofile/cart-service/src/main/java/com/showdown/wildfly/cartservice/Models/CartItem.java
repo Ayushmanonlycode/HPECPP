@@ -1,5 +1,5 @@
 package com.showdown.wildfly.cartservice.Models;
-
+import jakarta.json.bind.annotation.JsonbTransient;
 public class CartItem {
 
     private String itemId;
@@ -12,6 +12,7 @@ public class CartItem {
 
     private double price;
 
+    @jakarta.json.bind.annotation.JsonbTransient
     private Cart cart;
 
     public String getItemId() {

@@ -4,6 +4,9 @@ import com.showdown.wildfly.cartservice.Models.Cart;
 import com.showdown.wildfly.cartservice.Models.CartItem;
 import com.showdown.wildfly.cartservice.Repository.CartRepository;
 
+import com.showdown.wildfly.cartservice.Models.DTO.CartResponse;
+import com.showdown.wildfly.cartservice.Models.DTO.CartItemResponse;
+import java.util.ArrayList;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -43,5 +46,44 @@ public class CartService {
 
     public void clearCart(String userId) {
         repository.clearCart(userId);
+    }
+    public CartResponse buildCartResponse(Cart cart) {
+
+        if (cart == null) {
+            return null;
+        }
+
+        CartResponse response = new CartResponse();
+
+        response.setUserId(cart.getUserId());
+        response.setTotal(cart.getTotalAmount());
+
+        ArrayList<CartItemResponse> items = new ArrayList<>();
+
+        int itemCount = 0;
+
+        if (cart.getItems() != null) {
+
+            for (CartItem item : cart.getItems()) {
+
+                CartItemResponse dto = new CartItemResponse();
+
+                dto.setItemSku(item.getSku());
+                dto.setProductName(item.getProductName());
+                dto.setQuantity(item.getQuantity());
+                dto.setUnitPrice(item.getPrice());
+                dto.setSubtotal(
+                        item.getPrice() * item.getQuantity());
+
+                itemCount += item.getQuantity();
+
+                items.add(dto);
+            }
+        }
+
+        response.setItems(items);
+        response.setItemCount(itemCount);
+
+        return response;
     }
 }
