@@ -1,12 +1,8 @@
 package com.showdown.wildfly.cartservice.Models;
-
-import jakarta.persistence.*;
-//import jakarta.json.bind.annotation.JsonbTransient;
-
-@Entity
+import jakarta.json.bind.annotation.JsonbTransient;
+import java.math.BigDecimal;
 public class CartItem {
 
-    @Id
     private String itemId;
 
     private String sku;
@@ -15,10 +11,9 @@ public class CartItem {
 
     private int quantity;
 
-    private double price;
+    private BigDecimal price;
 
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
+    @jakarta.json.bind.annotation.JsonbTransient
     private Cart cart;
 
     public String getItemId() {
@@ -53,11 +48,11 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

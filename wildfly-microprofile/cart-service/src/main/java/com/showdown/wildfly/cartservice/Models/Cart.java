@@ -1,21 +1,14 @@
 package com.showdown.wildfly.cartservice.Models;
 
-import jakarta.persistence.Transient;
-import jakarta.persistence.*;
 import java.util.List;
-
-@Entity
+import java.math.BigDecimal;
 public class Cart {
 
-    @Id
     private String cartId;
 
     private String userId;
 
-    private double totalAmount;
-
-    //@OneToMany(mappedBy = "cart")
-    @Transient
+    private BigDecimal totalAmount;
     private List<CartItem> items;
 
     public String getCartId() {
@@ -34,11 +27,11 @@ public class Cart {
         this.userId = userId;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 

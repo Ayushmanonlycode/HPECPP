@@ -24,7 +24,7 @@ public class OrderFulfillmentRepository {
                 OrderFulfillment.class
         ).getResultList();
     }
-    
+
     public OrderFulfillment getOrderById(String orderId) {
         return em.find(OrderFulfillment.class, orderId);
     }
@@ -41,6 +41,7 @@ public class OrderFulfillmentRepository {
             em.remove(order);
         }
     }
+
     public List<OrderFulfillment> getOrdersByStatus(String status) {
         return em.createQuery(
                 "SELECT o FROM OrderFulfillment o WHERE o.status = :status",
@@ -48,6 +49,7 @@ public class OrderFulfillmentRepository {
                 .setParameter("status", status)
                 .getResultList();
     }
+
     public void shipOrder(String orderId) {
 
         OrderFulfillment order =
@@ -86,6 +88,7 @@ public class OrderFulfillmentRepository {
             em.merge(order);
         }
     }
+
     public void processOrder(String orderId) {
 
         OrderFulfillment order =
@@ -96,6 +99,7 @@ public class OrderFulfillmentRepository {
             em.merge(order);
         }
     }
+
     public void failOrder(String orderId) {
 
         OrderFulfillment order =
@@ -108,6 +112,7 @@ public class OrderFulfillmentRepository {
             em.merge(order);
         }
     }
+
     public OrderFulfillment getByTrackingNumber(String trackingNumber) {
 
         try {
@@ -121,12 +126,14 @@ public class OrderFulfillmentRepository {
             return null;
         }
     }
-        public long countOrders() {
+
+    public long countOrders() {
         return em.createQuery(
                 "SELECT COUNT(o) FROM OrderFulfillment o",
                 Long.class)
                 .getSingleResult();
     }
+
     public double getTotalRevenue() {
 
         Double revenue = em.createQuery(
