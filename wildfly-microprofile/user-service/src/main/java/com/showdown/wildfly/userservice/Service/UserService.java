@@ -19,7 +19,9 @@ public class UserService {
         if(userRepository.findByEmail(user.getEmail()) != null) {
             throw new RuntimeException("Email already exists");
         }
-
+        if(user.getStatus() == null) {
+            user.setStatus("ACTIVE");
+        }
         user.setId(UUID.randomUUID().toString());
 
         user.setCreatedAt(Instant.now());
