@@ -21,7 +21,7 @@ public class Item {
     private Product product;
 
 
-    private BigDecimal price;
+    private BigDecimal listPrice;
 
     public String getId() {
         return id;
@@ -47,13 +47,12 @@ public class Item {
         this.product = product;
     }
 
-
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getListPrice() {
+        return listPrice;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setListPrice(BigDecimal listPrice) {
+        this.listPrice = listPrice;
     }
 
     public String getSku() {

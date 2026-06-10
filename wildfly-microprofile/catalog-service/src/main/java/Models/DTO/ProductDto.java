@@ -5,6 +5,7 @@ public class ProductDto {
     private String name;
     private String availability;
     private String categoryId; // just the ID, not the full object
+    private String categoryName;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -17,4 +18,7 @@ public class ProductDto {
 
     public String getCategoryId() { return categoryId; }
     public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
+
+    public String getCategoryName() { return categoryName; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 }

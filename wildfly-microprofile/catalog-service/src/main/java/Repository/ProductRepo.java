@@ -26,6 +26,7 @@ public class ProductRepo {
                     dto.setId(p.getId());
                     dto.setName(p.getName());
                     dto.setAvailability(p.getAvailability());
+                    dto.setCategoryName(p.getCategoryName());
                     if (p.getCategory() != null) {
                         dto.setCategoryId(p.getCategory().getId());
                     }
@@ -42,7 +43,7 @@ public class ProductRepo {
     }
 
     public List<ProductDto> getProductsbyCategory(String categoryId) {
-        return em.createQuery("SELECT p FROM Product p WHERE p.category.id = :categoryId", Product.class)
+        return em.createQuery("SELECT p FROM Product p WHERE p.categoryName = :categoryId", Product.class)
                 .setParameter("categoryId", categoryId)
                 .getResultList()
                 .stream()
@@ -67,6 +68,7 @@ public class ProductRepo {
             product.setId(dto.getId());
             product.setName(dto.getName());
             product.setAvailability(dto.getAvailability());
+            product.setCategoryName(dto.getCategoryName());
 
             if (dto.getCategoryId() != null) {
                 Category category = em.getReference(Category.class, dto.getCategoryId());

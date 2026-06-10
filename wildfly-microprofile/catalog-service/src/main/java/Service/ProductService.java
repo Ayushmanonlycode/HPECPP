@@ -32,6 +32,7 @@ public class ProductService {
         dto.setId(p.getId());
         dto.setName(p.getName());
         dto.setAvailability(p.getAvailability());
+        dto.setCategoryName(p.getCategoryName());
         if (p.getCategory() != null) {
             dto.setCategoryId(p.getCategory().getId());
         }

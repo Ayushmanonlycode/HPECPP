@@ -18,7 +18,7 @@ public class ProductController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ProductDto> getProducts(@QueryParam("categoryId") String category){
+    public List<ProductDto> getProducts(@QueryParam("category") String category){
         if (category == null) {
             return productService.getAllProducts();
         }

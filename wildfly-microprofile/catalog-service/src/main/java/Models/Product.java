@@ -17,6 +17,8 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    private String categoryName;
+
     @OneToMany(mappedBy = "product") //ie. one product has many items. So, the Foreign key exists as product in Item.
     private List<Item> items;
 
@@ -58,5 +60,13 @@ public class Product {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

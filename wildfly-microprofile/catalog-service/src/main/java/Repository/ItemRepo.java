@@ -26,8 +26,9 @@ public class ItemRepo {
                     ItemDto dto = new ItemDto();
                     dto.setId(i.getId());
                     dto.setItemName(i.getItemName());
-                    dto.setPrice(i.getPrice());
+                    dto.setListPrice(i.getListPrice());
                     dto.setSku(i.getSku());
+                    dto.setImageUrl(i.getImageUrl());
                     if (i.getProduct() != null) {
                         dto.setProductId(i.getProduct().getId());
                     }
@@ -43,8 +44,9 @@ public class ItemRepo {
             Item item = new Item();
             item.setId(dto.getId());
             item.setItemName(dto.getItemName());
-            item.setPrice(dto.getPrice());
+            item.setListPrice(dto.getListPrice());
             item.setSku(dto.getSku());
+            item.setImageUrl(dto.getImageUrl());
 
             if (dto.getProductId() != null) {
                 Product product = em.getReference(Product.class, dto.getProductId());
@@ -75,7 +77,8 @@ public class ItemRepo {
                     ItemDto dto = new ItemDto();
                     dto.setId(i.getId());
                     dto.setItemName(i.getItemName());
-                    dto.setPrice(i.getPrice());
+                    dto.setListPrice(i.getListPrice());
+                    dto.setImageUrl(i.getImageUrl());
                     dto.setSku(i.getSku());
                     if (i.getProduct() != null) {
                         dto.setProductId(i.getProduct().getId());

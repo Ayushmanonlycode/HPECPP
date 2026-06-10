@@ -7,7 +7,7 @@ public class ItemDto {
     private String sku;
     private String itemName;
     private String productId;
-    private BigDecimal price;
+    private BigDecimal listPrice;
     private String imageUrl;
 
     public String getId() { return id; }
@@ -19,8 +19,14 @@ public class ItemDto {
     public String getProductId() { return productId; }
     public void setProductId(String productId) { this.productId = productId; }
 
-    public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public BigDecimal getListPrice() {
+        return listPrice;
+    }
+
+    public void setListPrice(BigDecimal listPrice) {
+        this.listPrice = listPrice;
+    }
+
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
 

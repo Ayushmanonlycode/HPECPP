@@ -23,6 +23,7 @@ public class UserService {
        u.setName(dto.getName());
        u.setPhoneNumber(dto.getPhoneNumber());
        u.setRole(dto.getRole());
+       u.setPassword(dto.getPassword());
 
         if(userRepository.findByEmail(u.getEmail()) != null) {
             throw new RuntimeException("Email already exists");

@@ -30,7 +30,7 @@ public class ItemService {
         ItemDto dto = new ItemDto();
         dto.setId(i.getId());
         dto.setItemName(i.getItemName());
-        dto.setPrice(i.getPrice());
+        dto.setListPrice(i.getListPrice());
         dto.setSku(i.getSku());
         dto.setImageUrl(i.getImageUrl());
         if (i.getProduct() != null) {
@@ -51,7 +51,7 @@ public class ItemService {
         ItemDto dto = new ItemDto();
         dto.setId(i.getId());
         dto.setItemName(i.getItemName());
-        dto.setPrice(i.getPrice());
+        dto.setListPrice(i.getListPrice());
         dto.setSku(i.getSku());
         dto.setImageUrl(i.getImageUrl());
         if (i.getProduct() != null) {
