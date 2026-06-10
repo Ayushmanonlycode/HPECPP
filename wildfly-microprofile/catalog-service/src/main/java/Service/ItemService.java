@@ -32,6 +32,7 @@ public class ItemService {
         dto.setItemName(i.getItemName());
         dto.setPrice(i.getPrice());
         dto.setSku(i.getSku());
+        dto.setImageUrl(i.getImageUrl());
         if (i.getProduct() != null) {
             dto.setProductId(i.getProduct().getId());
         }
@@ -52,6 +53,7 @@ public class ItemService {
         dto.setItemName(i.getItemName());
         dto.setPrice(i.getPrice());
         dto.setSku(i.getSku());
+        dto.setImageUrl(i.getImageUrl());
         if (i.getProduct() != null) {
             dto.setProductId(i.getProduct().getId());
         }

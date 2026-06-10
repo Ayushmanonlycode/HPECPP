@@ -8,6 +8,7 @@ public class ItemDto {
     private String itemName;
     private String productId;
     private BigDecimal price;
+    private String imageUrl;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -22,4 +23,7 @@ public class ItemDto {
     public void setPrice(BigDecimal price) { this.price = price; }
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
