@@ -5,9 +5,9 @@ import com.showdown.wildfly.userservice.Repository.UserRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
+import java.time.Instant;
 import java.util.List;
-
+import java.util.UUID;
 @ApplicationScoped
 public class UserService {
 
@@ -20,9 +20,14 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
+        user.setId(UUID.randomUUID().toString());
+
+        user.setCreatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now());
+
         userRepository.addUser(user);
     }
-
+    
     public User getUserById(String id) {
         return userRepository.getUserById(id);
     }
@@ -32,19 +37,25 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+
+        User existingUser =
+                userRepository.getUserById(user.getId());
+
+        if (existingUser == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setCreatedAt(existingUser.getCreatedAt());
+
+        user.setUpdatedAt(Instant.now());
+
         return userRepository.updateUser(user);
     }
 
     public void deleteUser(String id) {
         userRepository.deleteUser(id);
     }
-    public User login(String email, String password) {
-        return userRepository.login(email, password);
-    }
-    public User getUserByEmail(String email) {
-        return userRepository.getUserByEmail(email);
-    }
-    public long countUsers() {
-        return userRepository.countUsers();
+    public User login(String username, String password) {
+        return userRepository.login(username, password);
     }
 }

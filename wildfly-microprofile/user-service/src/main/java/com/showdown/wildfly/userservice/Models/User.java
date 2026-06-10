@@ -4,35 +4,34 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import java.time.Instant;
 @Entity
 @Table(name = "User")
 public class User {
 
     @Id
     private String id;
-
-    private String name;
+    private Instant createdAt;
+    private Instant updatedAt;
     @Column(unique = true)
     private String email;
     private String password;
     private String address;
-    private String phoneNumber;
-    private String role;
+    private String username;
 
+    private String firstName;
+    private String lastName;
+
+    private String phone;
+
+    private String city;
+    private String state;
+    private String zip;
+    private String country;
+
+    private String status;
+  
     public User() {
-    }
-
-    public User(String id, String name, String email,
-                String password, String address,
-                String phoneNumber, String role) {
-
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
     }
 
     public String getId() {
@@ -41,14 +40,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEmail() {
@@ -75,19 +66,90 @@ public class User {
         this.address = address;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getRole() {
-        return role;
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

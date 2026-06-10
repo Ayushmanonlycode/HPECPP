@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@Path("/user")
+@Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserController {
@@ -20,11 +20,13 @@ public class UserController {
     UserService userService;
 
     @POST
-    @Path("/add")
+    @Path("/register")
     @Transactional
-    public String addUser(User user) {
+    public User addUser(User user) {
+
         userService.addUser(user);
-        return "User Added Successfully";
+
+        return user;
     }
 
     @GET
@@ -47,9 +49,14 @@ public class UserController {
         return "User Deleted Successfully";
     }
     @PUT
-    @Path("/update")
+    @Path("/{id}/profile")
     @Transactional
-    public User updateUser(User user) {
+    public User updateUser(
+            @PathParam("id") String id,
+            User user) {
+
+        user.setId(id);
+
         return userService.updateUser(user);
     }
     @POST
@@ -57,17 +64,7 @@ public class UserController {
     public User login(LoginDto loginDto) {
 
         return userService.login(
-                loginDto.getEmail(),
+                loginDto.getUsername(),
                 loginDto.getPassword());
-    }
-    @GET
-    @Path("/email/{email}")
-    public User getUserByEmail(@PathParam("email") String email) {
-        return userService.getUserByEmail(email);
-    }
-    @GET
-    @Path("/count")
-    public long countUsers() {
-        return userService.countUsers();
     }
 }
