@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.Instant;
 @Entity
-@Table(name = "User")
+@Table(name = "Users")
 public class User {
 
     @Id

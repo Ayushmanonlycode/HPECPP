@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 
 public class LineItemDto {
 
-    private String itemId;
+    private String itemSku;
     private int quantity;
     private BigDecimal unitPrice;
 
-    public String getItemId() { return itemId; }
-    public void setItemId(String itemId) { this.itemId = itemId; }
+    public String getItemSku() { return itemSku; }
+    public void setItemSku(String itemId) { this.itemSku = itemId; }
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }

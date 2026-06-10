@@ -17,7 +17,7 @@
         <module>catalog-service</module>
         <module>inventory-service</module>
         <module>order-capture-service</module>
-        <module>order-fulfilment-service</module>
+        <module>order-fulfillment-service</module>
         <module>cart-service</module>
     </modules>
 

@@ -27,6 +27,7 @@ public class ItemRepo {
                     dto.setId(i.getId());
                     dto.setItemName(i.getItemName());
                     dto.setPrice(i.getPrice());
+                    dto.setSku(i.getSku());
                     if (i.getProduct() != null) {
                         dto.setProductId(i.getProduct().getId());
                     }
@@ -43,6 +44,7 @@ public class ItemRepo {
             item.setId(dto.getId());
             item.setItemName(dto.getItemName());
             item.setPrice(dto.getPrice());
+            item.setSku(dto.getSku());
 
             if (dto.getProductId() != null) {
                 Product product = em.getReference(Product.class, dto.getProductId());
@@ -58,22 +60,10 @@ public class ItemRepo {
         }
     }
 
-    public List<ItemDto> getItemsById(String id) {
+    public Item getItemsById(String id) {
         return em.createQuery("SELECT i FROM Item i WHERE i.id = :id", Item.class)
                 .setParameter("id", id)
-                .getResultList()
-                .stream()
-                .map(i -> {
-                    ItemDto dto = new ItemDto();
-                    dto.setId(i.getId());
-                    dto.setItemName(i.getItemName());
-                    dto.setPrice(i.getPrice());
-                    if (i.getProduct() != null) {
-                        dto.setProductId(i.getProduct().getId());
-                    }
-                    return dto;
-                })
-                .toList();
+                .getSingleResult();
     }
 
     public List<ItemDto> getItemsByProductId(String pid) {
@@ -86,11 +76,18 @@ public class ItemRepo {
                     dto.setId(i.getId());
                     dto.setItemName(i.getItemName());
                     dto.setPrice(i.getPrice());
+                    dto.setSku(i.getSku());
                     if (i.getProduct() != null) {
                         dto.setProductId(i.getProduct().getId());
                     }
                     return dto;
                 })
                 .toList();
+    }
+
+    public Item getItemsBySku(String sku) {
+        return em.createQuery("SELECT i FROM Item i WHERE i.sku = :SKU", Item.class)
+                .setParameter("SKU", sku)
+                .getSingleResult();
     }
 }

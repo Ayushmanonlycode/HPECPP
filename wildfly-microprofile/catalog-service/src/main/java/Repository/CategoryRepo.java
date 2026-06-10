@@ -51,17 +51,9 @@ public class CategoryRepo {
         }
     }
 
-    public List<CategoryDto> getCategoriesById(String id) {
+    public Category getCategoriesById(String id) {
         return em.createQuery("SELECT c FROM Category c WHERE c.id = :id", Category.class)
                 .setParameter("id", id)
-                .getResultList()
-                .stream()
-                .map(c -> {
-                    CategoryDto dto = new CategoryDto();
-                    dto.setId(c.getId());
-                    dto.setCategoryName(c.getCategoryName());
-                    return dto;
-                })
-                .toList();
+                .getSingleResult();
     }
 }

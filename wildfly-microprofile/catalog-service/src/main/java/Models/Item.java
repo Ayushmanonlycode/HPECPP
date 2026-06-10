@@ -10,11 +10,16 @@ public class Item {
     @Id
     private String id;
 
+    private String sku;
+
     private String itemName;
+
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "product_id") //So, product_id is a foreign key in the Item table
     private Product product;
+
 
     private BigDecimal price;
 
@@ -49,5 +54,19 @@ public class Item {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

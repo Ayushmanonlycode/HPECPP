@@ -10,7 +10,7 @@
 
     <persistence-unit name="userPU" transaction-type="JTA">
 
-        <jta-data-source>java:/UserDS</jta-data-source>
+        <jta-data-source>java:/UserDSP</jta-data-source>
 
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="update"/>

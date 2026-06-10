@@ -13,8 +13,8 @@ public class LineItem {
     @Column(name = "LINENUM")
     private Integer lineNum;
 
-    @Column(name = "ITEMID", nullable = false, length = 10)
-    private String itemId;
+    @Column(name = "ITEMSKU", nullable = false, length = 10)
+    private String itemSku;
 
     @Column(name = "QUANTITY", nullable = false)
     private int quantity;
@@ -29,8 +29,8 @@ public class LineItem {
     public Integer getLineNum() { return lineNum; }
     public void setLineNum(Integer lineNum) { this.lineNum = lineNum; }
 
-    public String getItemId() { return itemId; }
-    public void setItemId(String itemId) { this.itemId = itemId; }
+    public String getItemSku() { return itemSku; }
+    public void setItemSku(String itemId) { this.itemSku = itemId; }
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }

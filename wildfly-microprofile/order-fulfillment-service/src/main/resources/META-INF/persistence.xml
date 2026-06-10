@@ -10,7 +10,7 @@
 
     <persistence-unit name="fulfillmentPU" transaction-type="JTA">
 
-        <jta-data-source>java:/MySqlOrderCapture</jta-data-source>
+        <jta-data-source>java:/OrdersDSP</jta-data-source>
 
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="update"/>

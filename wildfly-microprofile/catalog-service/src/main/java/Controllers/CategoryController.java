@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/category")
+@Path("/categories")
 public class CategoryController {
 
     @Inject
@@ -19,7 +19,6 @@ public class CategoryController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("all")
     public List<CategoryDto> getCategories() {
         return categoryService.getCategories();
 
@@ -28,8 +27,8 @@ public class CategoryController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/search")
-    public List<CategoryDto> getCategories(@QueryParam("id") String id) {
+    @Path("/{id}")
+    public CategoryDto getCategories(@PathParam("id") String id) {
         return categoryService.getCategoriesById(id);
 
     }

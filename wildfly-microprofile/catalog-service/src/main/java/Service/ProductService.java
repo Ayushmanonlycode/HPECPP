@@ -25,8 +25,18 @@ public class ProductService {
     }
 
 
-    public List<ProductDto> getProductsbyId(String id){
-        return productRepo.getProductsbyId(id);
+    public ProductDto getProductsbyId(String id){
+        Product p=  productRepo.getProductsbyId(id);
+
+        ProductDto dto = new ProductDto();
+        dto.setId(p.getId());
+        dto.setName(p.getName());
+        dto.setAvailability(p.getAvailability());
+        if (p.getCategory() != null) {
+            dto.setCategoryId(p.getCategory().getId());
+        }
+
+        return dto;
     }
 
     public List<ProductDto> getProductsByCategory(String category){
@@ -34,4 +44,7 @@ public class ProductService {
     }
 
 
+    public List<ProductDto> getProductsByName(String name) {
+        return productRepo.getProductsByName(name);
+    }
 }

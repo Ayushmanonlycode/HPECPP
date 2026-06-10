@@ -10,17 +10,20 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("product")
+@Path("products")
 public class ProductController {
 
     @Inject
     ProductService productService;
 
     @GET
-    @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ProductDto> getProducts(){
-        return productService.getAllProducts();
+    public List<ProductDto> getProducts(@QueryParam("categoryId") String category){
+        if (category == null) {
+            return productService.getAllProducts();
+        }
+
+        return productService.getProductsByCategory(category);
 
     }
 
@@ -41,22 +44,24 @@ public class ProductController {
 
 
     @GET
-    @Path("/search")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ProductDto> getProductsbyId(@QueryParam("id") String id){
+    public ProductDto getProductsbyId(@PathParam("id") String id){
         return productService.getProductsbyId(id);
 
     }
 
 
+
+
+
     @GET
-    @Path("/search/category")
+    @Path("/search")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ProductDto> getProductsbyCategory(@QueryParam("cat") String category){
-        return productService.getProductsByCategory(category);
+    public List<ProductDto> getProductsbyName(@QueryParam("q") String name){
+        return productService.getProductsByName(name);
 
     }
-
 
 
 }

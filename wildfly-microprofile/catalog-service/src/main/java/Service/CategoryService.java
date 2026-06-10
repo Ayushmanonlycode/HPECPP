@@ -23,7 +23,13 @@ public class CategoryService {
         return categoryRepo.addCategory(category);
     }
 
-    public List<CategoryDto> getCategoriesById(String id) {
-        return categoryRepo.getCategoriesById(id);
+    public CategoryDto getCategoriesById(String id) {
+
+        Category c= categoryRepo.getCategoriesById(id);
+
+        CategoryDto dto = new CategoryDto();
+        dto.setId(c.getId());
+        dto.setCategoryName(c.getCategoryName());
+        return dto;
     }
 }
