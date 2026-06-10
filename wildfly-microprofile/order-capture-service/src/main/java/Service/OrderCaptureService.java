@@ -24,6 +24,7 @@ public class OrderCaptureService {
         Orders order = new Orders();
 
         order.setCustomerId(orderDto.getCustomerId());
+        order.setAddress(orderDto.getAddress());
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -42,7 +43,7 @@ public class OrderCaptureService {
 
             LineItem lineItem = new LineItem();
 
-            lineItem.setItemId(itemDto.getItemId());
+            lineItem.setItemSku(itemDto.getItemSku());
             lineItem.setQuantity(quantity);
             lineItem.setUnitPrice(price);
 
@@ -66,6 +67,7 @@ public class OrderCaptureService {
             dto.setTotalAmount(order.getTotalAmount());
             dto.setCreatedAt(order.getCreatedAt());
             dto.setStatus(order.getStatus());
+            dto.setAddress(order.getAddress());
 
             List<LineItemDto> lineItemDtos =
                     order.getLineItems()
@@ -74,7 +76,7 @@ public class OrderCaptureService {
 
                                 LineItemDto itemDto = new LineItemDto();
 
-                                itemDto.setItemId(item.getItemId());
+                                itemDto.setItemSku(item.getItemSku());
                                 itemDto.setQuantity(item.getQuantity());
                                 itemDto.setUnitPrice(item.getUnitPrice());
 
@@ -103,6 +105,7 @@ public class OrderCaptureService {
             dto.setTotalAmount(order.getTotalAmount());
             dto.setCreatedAt(order.getCreatedAt());
             dto.setStatus(order.getStatus());
+            dto.setAddress(order.getAddress());
 
             List<LineItemDto> lineItemDtos =
                     order.getLineItems()
@@ -111,7 +114,7 @@ public class OrderCaptureService {
 
                                 LineItemDto itemDto = new LineItemDto();
 
-                                itemDto.setItemId(item.getItemId());
+                                itemDto.setItemSku(item.getItemSku());
                                 itemDto.setQuantity(item.getQuantity());
                                 itemDto.setUnitPrice(item.getUnitPrice());
 
@@ -137,6 +140,7 @@ public class OrderCaptureService {
         dto.setTotalAmount(order.getTotalAmount());
         dto.setCreatedAt(order.getCreatedAt());
         dto.setStatus(order.getStatus());
+        dto.setAddress(order.getAddress());
 
         List<LineItemDto> lineItemDtos =
                 order.getLineItems()
@@ -145,7 +149,7 @@ public class OrderCaptureService {
 
                             LineItemDto itemDto = new LineItemDto();
 
-                            itemDto.setItemId(item.getItemId());
+                            itemDto.setItemSku(item.getItemSku());
                             itemDto.setQuantity(item.getQuantity());
                             itemDto.setUnitPrice(item.getUnitPrice());
 

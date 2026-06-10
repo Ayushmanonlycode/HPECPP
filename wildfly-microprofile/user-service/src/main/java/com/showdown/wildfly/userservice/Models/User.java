@@ -1,15 +1,16 @@
 package com.showdown.wildfly.userservice.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+
+import java.util.UUID;
+
 @Entity
 @Table(name = "Users")
 public class User {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     private String name;
     @Column(unique = true)
@@ -22,11 +23,10 @@ public class User {
     public User() {
     }
 
-    public User(String id, String name, String email,
+    public User(String name, String email,
                 String password, String address,
                 String phoneNumber, String role) {
 
-        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -35,11 +35,11 @@ public class User {
         this.role = role;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

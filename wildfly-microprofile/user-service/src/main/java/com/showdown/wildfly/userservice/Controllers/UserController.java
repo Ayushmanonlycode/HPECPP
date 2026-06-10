@@ -1,5 +1,6 @@
 package com.showdown.wildfly.userservice.Controllers;
 
+import com.showdown.wildfly.userservice.Models.DTO.UserDto;
 import com.showdown.wildfly.userservice.Models.User;
 import com.showdown.wildfly.userservice.Service.UserService;
 import com.showdown.wildfly.userservice.Models.DTO.LoginDto;
@@ -22,7 +23,7 @@ public class UserController {
     @POST
     @Path("/add")
     @Transactional
-    public String addUser(User user) {
+    public String addUser(UserDto user) {
         userService.addUser(user);
         return "User Added Successfully";
     }

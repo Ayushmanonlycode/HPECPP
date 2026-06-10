@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class ItemDto {
     private String id;
+    private String sku;
     private String itemName;
     private String productId;
     private BigDecimal price;
@@ -19,4 +20,6 @@ public class ItemDto {
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
 }

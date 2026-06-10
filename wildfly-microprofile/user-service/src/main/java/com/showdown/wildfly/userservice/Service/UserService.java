@@ -1,5 +1,6 @@
 package com.showdown.wildfly.userservice.Service;
 
+import com.showdown.wildfly.userservice.Models.DTO.UserDto;
 import com.showdown.wildfly.userservice.Models.User;
 import com.showdown.wildfly.userservice.Repository.UserRepository;
 
@@ -14,13 +15,20 @@ public class UserService {
     @Inject
     UserRepository userRepository;
 
-   public void addUser(User user) {
+   public void addUser(UserDto dto) {
 
-        if(userRepository.findByEmail(user.getEmail()) != null) {
+       User u= new User();
+       u.setAddress(dto.getAddress());
+       u.setEmail(dto.getEmail());
+       u.setName(dto.getName());
+       u.setPhoneNumber(dto.getPhoneNumber());
+       u.setRole(dto.getRole());
+
+        if(userRepository.findByEmail(u.getEmail()) != null) {
             throw new RuntimeException("Email already exists");
         }
 
-        userRepository.addUser(user);
+        userRepository.addUser(u);
     }
 
     public User getUserById(String id) {

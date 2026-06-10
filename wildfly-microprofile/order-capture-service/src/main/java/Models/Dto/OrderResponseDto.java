@@ -14,6 +14,7 @@ public class OrderResponseDto {
     private LocalDateTime createdAt;
     private OrderStatus status;
     private List<LineItemDto> lineItems;
+    private String address;
 
     // getters/setters
 
@@ -64,5 +65,13 @@ public class OrderResponseDto {
 
     public void setLineItems(List<LineItemDto> lineItems) {
         this.lineItems = lineItems;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

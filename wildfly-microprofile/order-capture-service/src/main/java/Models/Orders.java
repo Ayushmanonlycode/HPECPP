@@ -17,6 +17,9 @@ public class Orders {
     @Column(name = "ORDERID", length = 36)
     private String orderId;
 
+    @Column(name = "ADDRESS", nullable = false)
+    private String address;
+
     @Column(name = "USERID", nullable = false, length = 80)
     private String customerId;
 
@@ -84,5 +87,13 @@ public class Orders {
 
     public List<LineItem> getLineItems() {
         return lineItems;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

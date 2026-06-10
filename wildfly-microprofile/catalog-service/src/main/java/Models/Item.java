@@ -10,6 +10,8 @@ public class Item {
     @Id
     private String id;
 
+    private String sku;
+
     private String itemName;
 
     @ManyToOne
@@ -49,5 +51,12 @@ public class Item {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 }

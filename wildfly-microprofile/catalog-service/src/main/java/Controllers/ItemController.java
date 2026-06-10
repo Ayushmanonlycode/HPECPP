@@ -20,9 +20,9 @@ public class ItemController {
 
 
     @GET
-    @Path("/search")
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ItemDto> getItemsById(@QueryParam("id") String id) {
+    public ItemDto getItemsById(@PathParam("id") String id) {
         return itemService.getItemsById(id);
     }
 
@@ -33,6 +33,14 @@ public class ItemController {
             return itemService.getItems();
         }
         return itemService.getItemsByProductId(pid);
+    }
+
+
+    @GET
+    @Path("/sku/{sku}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ItemDto getItemsBySku(@PathParam("sku") String sku) {
+        return itemService.getItemsBySku(sku);
     }
 
 
