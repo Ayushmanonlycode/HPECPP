@@ -16,9 +16,9 @@
     import redis.clients.jedis.JedisPool;
     import redis.clients.jedis.exceptions.JedisException;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-    import java.util.Set;
+    import java.math.BigDecimal;
+    import java.util.ArrayList;
+
     import java.util.logging.Logger;
 
     @ApplicationScoped
@@ -66,7 +66,12 @@ import java.util.ArrayList;
         }
 
         public void addCart(Cart cart) {
-            if (cart.getItems() == null) cart.setItems(new ArrayList<>());
+
+            if (cart.getItems() == null)
+                cart.setItems(new ArrayList<>());
+
+            cart.setUpdatedAt(java.time.Instant.now());
+
             try (Jedis jedis = pool.getResource()) {
                 jedis.setex(cartKey(cart.getUserId()), 86400, jsonb.toJson(cart));
             } catch (JedisException e) {
@@ -74,88 +79,99 @@ import java.util.ArrayList;
             }
         }
 
-        public void addItem(CartItem item) {
-            Cart cart = getCartByUserId(item.getCart().getUserId());
-            if (cart == null) return;
-            if (cart.getItems() == null) cart.setItems(new ArrayList<>());
+        public void addItem(String userId, CartItem item) {
+
+            Cart cart = getCartByUserId(userId);
+
+            if (cart == null) {
+
+               cart = new Cart();
+                cart.setUserId(userId);
+                cart.setItems(new ArrayList<>());
+                cart.setTotalAmount(BigDecimal.ZERO);
+
+                cart.setCreatedAt(java.time.Instant.now());
+                cart.setUpdatedAt(java.time.Instant.now());
+            }
+
+            if (cart.getItems() == null)
+                cart.setItems(new ArrayList<>());
+
+            for (CartItem existing : cart.getItems()) {
+
+                if (existing.getSku().equals(item.getSku())) {
+
+                    existing.setQuantity(
+                        existing.getQuantity() + item.getQuantity()
+                    );
+
+                    recalculateTotal(cart);
+
+                    addCart(cart);
+
+                    return;
+                }
+            }
+
             cart.getItems().add(item);
+
             recalculateTotal(cart);
+
             addCart(cart);
         }
 
-        public CartItem getItemBySku(String sku) {
-            try (Jedis jedis = pool.getResource()) {
-                Set<String> keys = jedis.keys("cart:*");
-                for (String key : keys) {
-                    String json = jedis.get(key);
-                    if (json == null) continue;
-                    Cart cart = jsonb.fromJson(json, Cart.class);
-                    if (cart.getItems() == null) continue;
-                    for (CartItem item : cart.getItems()) {
-                        if (item.getSku().equals(sku)) return item;
-                    }
-                }
-            } catch (JedisException e) {
-                log.severe("Redis error in getItemBySku: " + e.getMessage());
-            }
-            return null;
-        }
+        public CartItem getItemBySku(String userId, String sku) {
 
-        public CartItem updateItem(CartItem item) {
+            Cart cart = getCartByUserId(userId);
 
-            try (Jedis jedis = pool.getResource()) {
+            if (cart == null || cart.getItems() == null)
+                return null;
 
-                Set<String> keys = jedis.keys("cart:*");
+            for (CartItem item : cart.getItems()) {
 
-                for (String key : keys) {
-
-                    String json = jedis.get(key);
-
-                    if (json == null)
-                        continue;
-
-                    Cart cart = jsonb.fromJson(json, Cart.class);
-
-                    if (cart.getItems() == null)
-                        continue;
-
-                    for (int i = 0; i < cart.getItems().size(); i++) {
-
-                        if (cart.getItems().get(i).getSku().equals(item.getSku())) {
-
-                            cart.getItems().set(i, item);
-
-                            recalculateTotal(cart);
-
-                            addCart(cart);
-
-                            return item;
-                        }
-                    }
-                }
-
-            } catch (JedisException e) {
-                log.severe("Redis error in updateItem: " + e.getMessage());
+                if (item.getSku().equals(sku))
+                    return item;
             }
 
             return null;
         }
 
-        public void removeItem(String sku) {
-            try (Jedis jedis = pool.getResource()) {
-                Set<String> keys = jedis.keys("cart:*");
-                for (String key : keys) {
-                    String json = jedis.get(key);
-                    if (json == null) continue;
-                    Cart cart = jsonb.fromJson(json, Cart.class);
-                    if (cart.getItems() == null) continue;
-                    cart.getItems().removeIf(i -> i.getSku().equals(sku));
+        public CartItem updateItem(String userId, CartItem item) {
+
+            Cart cart = getCartByUserId(userId);
+
+            if (cart == null || cart.getItems() == null)
+                return null;
+
+            for (int i = 0; i < cart.getItems().size(); i++) {
+
+                if (cart.getItems().get(i).getSku().equals(item.getSku())) {
+
+                    cart.getItems().set(i, item);
+
                     recalculateTotal(cart);
+
                     addCart(cart);
+
+                    return item;
                 }
-            } catch (JedisException e) {
-                log.severe("Redis error in removeItem: " + e.getMessage());
             }
+
+            return null;
+        }
+
+        public void removeItem(String userId, String sku) {
+
+            Cart cart = getCartByUserId(userId);
+
+            if (cart == null || cart.getItems() == null)
+                return;
+
+            cart.getItems().removeIf(i -> i.getSku().equals(sku));
+
+            recalculateTotal(cart);
+
+            addCart(cart);
         }
 
         public void clearCart(String userId) {

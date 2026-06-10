@@ -19,31 +19,55 @@ public class CartService {
     CartRepository repository;
 
     public Cart getCart(String userId) {
-        return repository.getCartByUserId(userId);
-    }
 
-    public void createCart(Cart cart) {
-        repository.addCart(cart);
-    }
+        Cart cart = repository.getCartByUserId(userId);
 
-    public void addItem(CartItem item) {
-        repository.addItem(item);
-    }
+        if (cart == null) {
 
-    public CartItem updateQuantity(String sku, int quantity) {
+            cart = new Cart();
+            cart.setUserId(userId);
+            cart.setItems(new ArrayList<>());
+            cart.setTotalAmount(BigDecimal.ZERO);
 
-        CartItem item = repository.getItemBySku(sku);
+            cart.setCreatedAt(java.time.Instant.now());
+            cart.setUpdatedAt(java.time.Instant.now());
 
-        if (item != null) {
-            item.setQuantity(quantity);
-            repository.updateItem(item);
+            repository.addCart(cart);
         }
+
+        return cart;
+    }
+
+    public void addItem(String userId, CartItem item) {
+        repository.addItem(userId, item);
+    }
+
+    public CartItem updateQuantity(String userId,
+                               String sku,
+                               int quantity) {
+
+        CartItem item = repository.getItemBySku(userId, sku);
+
+        if (item == null) {
+            return null;
+        }
+
+        if (quantity <= 0) {
+
+            repository.removeItem(userId, sku);
+
+            return null;
+        }
+
+        item.setQuantity(quantity);
+
+        repository.updateItem(userId, item);
 
         return item;
     }
 
-    public void removeItem(String sku) {
-        repository.removeItem(sku);
+    public void removeItem(String userId, String sku) {
+        repository.removeItem(userId, sku);
     }
 
     public void clearCart(String userId) {

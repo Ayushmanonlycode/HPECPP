@@ -2,22 +2,14 @@ package com.showdown.wildfly.cartservice.Models;
 
 import java.util.List;
 import java.math.BigDecimal;
+import java.time.Instant;
 public class Cart {
 
-    private String cartId;
-
     private String userId;
-
+    private Instant createdAt;
+    private Instant updatedAt;
     private BigDecimal totalAmount;
     private List<CartItem> items;
-
-    public String getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(String cartId) {
-        this.cartId = cartId;
-    }
 
     public String getUserId() {
         return userId;
@@ -41,5 +33,20 @@ public class Cart {
 
     public void setItems(List<CartItem> items) {
         this.items = items;
+    }
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
