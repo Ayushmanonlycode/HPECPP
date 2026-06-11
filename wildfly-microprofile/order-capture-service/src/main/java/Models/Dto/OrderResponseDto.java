@@ -5,26 +5,27 @@ import Models.OrderStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class OrderResponseDto {
 
-    private String orderId;
+    private UUID id;
     private String customerId;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private OrderStatus status;
     private List<LineItemDto> lineItems;
-    private String address;
+    private String shippingAddress;
 
     // getters/setters
 
 
-    public String getOrderId() {
-        return orderId;
+    public UUID getId() {
+        return id;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getCustomerId() {
@@ -67,11 +68,11 @@ public class OrderResponseDto {
         this.lineItems = lineItems;
     }
 
-    public String getAddress() {
-        return address;
+    public String getShippingAddress() {
+        return shippingAddress;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
     }
 }

@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class OrderCaptureService {
@@ -19,17 +20,17 @@ public class OrderCaptureService {
     @Inject
     OrderCaptureRepo orderRepo;
 
-    public int placeOrder(OrderDto orderDto) {
+    public Orders placeOrder(OrderDto orderDto) {
 
         Orders order = new Orders();
 
-        order.setCustomerId(orderDto.getCustomerId());
-        order.setAddress(orderDto.getAddress());
+        order.setCustomerId(orderDto.getUserId());
+        order.setShippingAddress(orderDto.getShippingAddress());
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         if(orderDto.getLineItems() == null){
-            return 1;
+            return null;
         }
 
         for(LineItemDto itemDto : orderDto.getLineItems()) {
@@ -62,12 +63,12 @@ public class OrderCaptureService {
         return orders.stream().map(order -> {
             OrderResponseDto dto = new OrderResponseDto();
 
-            dto.setOrderId(order.getOrderId());
+            dto.setId(order.getId());
             dto.setCustomerId(order.getCustomerId());
             dto.setTotalAmount(order.getTotalAmount());
             dto.setCreatedAt(order.getCreatedAt());
             dto.setStatus(order.getStatus());
-            dto.setAddress(order.getAddress());
+            dto.setShippingAddress(order.getShippingAddress());
 
             List<LineItemDto> lineItemDtos =
                     order.getLineItems()
@@ -100,12 +101,12 @@ public class OrderCaptureService {
         return orders.stream().map(order -> {
             OrderResponseDto dto = new OrderResponseDto();
 
-            dto.setOrderId(order.getOrderId());
+            dto.setId(order.getId());
             dto.setCustomerId(order.getCustomerId());
             dto.setTotalAmount(order.getTotalAmount());
             dto.setCreatedAt(order.getCreatedAt());
             dto.setStatus(order.getStatus());
-            dto.setAddress(order.getAddress());
+            dto.setShippingAddress(order.getShippingAddress());
 
             List<LineItemDto> lineItemDtos =
                     order.getLineItems()
@@ -130,17 +131,17 @@ public class OrderCaptureService {
 
 
     @Transactional
-    public OrderResponseDto getByOid(String oid) {
+    public OrderResponseDto getByOid(UUID oid) {
         Orders order= orderRepo.getByOid(oid);
 
         OrderResponseDto dto = new OrderResponseDto();
 
-        dto.setOrderId(order.getOrderId());
+        dto.setId(order.getId());
         dto.setCustomerId(order.getCustomerId());
         dto.setTotalAmount(order.getTotalAmount());
         dto.setCreatedAt(order.getCreatedAt());
         dto.setStatus(order.getStatus());
-        dto.setAddress(order.getAddress());
+        dto.setShippingAddress(order.getShippingAddress());
 
         List<LineItemDto> lineItemDtos =
                 order.getLineItems()

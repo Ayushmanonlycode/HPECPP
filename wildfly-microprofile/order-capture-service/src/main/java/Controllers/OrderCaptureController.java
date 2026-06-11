@@ -2,6 +2,7 @@ package Controllers;
 
 import Models.Dto.OrderDto;
 import Models.Dto.OrderResponseDto;
+import Models.Orders;
 import Service.OrderCaptureService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -9,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.UUID;
 
 @Path("/orders")
 public class OrderCaptureController {
@@ -19,10 +21,12 @@ public class OrderCaptureController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response placeOrder(OrderDto orderDto) {
-        int res= orderService.placeOrder(orderDto);
+        Orders order= orderService.placeOrder(orderDto);
 
-        if(res==0){
-            return Response.ok("Order Placed Successfully").build();
+
+        if(order!=null){
+            orderDto.setId(order.getId());
+            return Response.ok(orderDto).build();
         }
 
         return Response.status(Response.Status.BAD_REQUEST)
@@ -54,7 +58,7 @@ public class OrderCaptureController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public OrderResponseDto getOrder(@PathParam("id") String id) {
+    public OrderResponseDto getOrder(@PathParam("id") UUID id) {
         return orderService.getByOid(id);
 
     }

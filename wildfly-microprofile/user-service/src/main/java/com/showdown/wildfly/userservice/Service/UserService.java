@@ -1,37 +1,35 @@
 package com.showdown.wildfly.userservice.Service;
 
-import com.showdown.wildfly.userservice.Models.DTO.UserDto;
 import com.showdown.wildfly.userservice.Models.User;
 import com.showdown.wildfly.userservice.Repository.UserRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
+import java.time.Instant;
 import java.util.List;
-
+import java.util.UUID;
 @ApplicationScoped
 public class UserService {
 
     @Inject
     UserRepository userRepository;
 
-   public void addUser(UserDto dto) {
+   public void addUser(User user) {
 
-       User u= new User();
-       u.setAddress(dto.getAddress());
-       u.setEmail(dto.getEmail());
-       u.setName(dto.getName());
-       u.setPhoneNumber(dto.getPhoneNumber());
-       u.setRole(dto.getRole());
-       u.setPassword(dto.getPassword());
-
-        if(userRepository.findByEmail(u.getEmail()) != null) {
+        if(userRepository.findByEmail(user.getEmail()) != null) {
             throw new RuntimeException("Email already exists");
         }
+        if(user.getStatus() == null) {
+            user.setStatus("ACTIVE");
+        }
+        user.setId(UUID.randomUUID().toString());
 
-        userRepository.addUser(u);
+        user.setCreatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now());
+
+        userRepository.addUser(user);
     }
-
+    
     public User getUserById(String id) {
         return userRepository.getUserById(id);
     }
@@ -41,19 +39,25 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+
+        User existingUser =
+                userRepository.getUserById(user.getId());
+
+        if (existingUser == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setCreatedAt(existingUser.getCreatedAt());
+
+        user.setUpdatedAt(Instant.now());
+
         return userRepository.updateUser(user);
     }
 
     public void deleteUser(String id) {
         userRepository.deleteUser(id);
     }
-    public User login(String email, String password) {
-        return userRepository.login(email, password);
-    }
-    public User getUserByEmail(String email) {
-        return userRepository.getUserByEmail(email);
-    }
-    public long countUsers() {
-        return userRepository.countUsers();
+    public User login(String username, String password) {
+        return userRepository.login(username, password);
     }
 }

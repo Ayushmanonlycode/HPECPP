@@ -13,7 +13,7 @@ public class LineItem {
     @Column(name = "LINENUM")
     private Integer lineNum;
 
-    @Column(name = "ITEMSKU", nullable = false, length = 10)
+    @Column(name = "ITEMSKU", nullable = false, length = 20)
     private String itemSku;
 
     @Column(name = "QUANTITY", nullable = false)

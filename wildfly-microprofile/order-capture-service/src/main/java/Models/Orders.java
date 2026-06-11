@@ -15,10 +15,10 @@ public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ORDERID", length = 36)
-    private String orderId;
+    private UUID id;
 
     @Column(name = "ADDRESS", nullable = false)
-    private String address;
+    private String shippingAddress;
 
     @Column(name = "USERID", nullable = false, length = 80)
     private String customerId;
@@ -53,8 +53,12 @@ public class Orders {
         }
     }
 
-    public String getOrderId() {
-        return orderId;
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getCustomerId() {
@@ -89,11 +93,11 @@ public class Orders {
         return lineItems;
     }
 
-    public String getAddress() {
-        return address;
+    public String getShippingAddress() {
+        return shippingAddress;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
     }
 }

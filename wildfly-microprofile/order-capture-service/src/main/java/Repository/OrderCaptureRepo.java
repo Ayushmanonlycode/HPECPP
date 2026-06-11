@@ -9,6 +9,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class OrderCaptureRepo {
@@ -17,15 +18,15 @@ public class OrderCaptureRepo {
     private EntityManager em;
 
     @Transactional
-    public int placeOrder(Orders order) {
+    public Orders placeOrder(Orders order) {
         try{
             em.persist(order);
-            return 0;
+            return order;
 
         }
         catch(Exception e){
             e.printStackTrace();
-            return 1;
+            return null;
         }
 
     }
@@ -45,9 +46,9 @@ public class OrderCaptureRepo {
 
     }
 
-    public Orders getByOid(String oid) {
+    public Orders getByOid(UUID oid) {
         return em.createQuery(
-                        "SELECT o FROM Orders o WHERE o.orderId = :orderId",
+                        "SELECT o FROM Orders o WHERE o.id = :orderId",
                         Orders.class
                 )
                 .setParameter("orderId", oid).getSingleResult();
