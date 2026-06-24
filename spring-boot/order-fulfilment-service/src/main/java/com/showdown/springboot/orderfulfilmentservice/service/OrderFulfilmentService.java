@@ -13,7 +13,7 @@ public interface OrderFulfilmentService {
 
     FulfilmentDto getFulfilment(UUID id);
 
-    FulfilmentDto getFulfilmentByOrder(UUID orderId);
+    FulfilmentDto getFulfilmentByOrder(String orderId);
 
     FulfilmentDto markProcessing(UUID id);
 

@@ -29,6 +29,8 @@ public class ItemDto {
 
     private String productName;
 
+    private Integer availableQuantity;
+
     public ItemDto() {
     }
 
@@ -41,6 +43,7 @@ public class ItemDto {
         this.imageUrl = imageUrl;
         this.productId = productId;
         this.productName = productName;
+        this.availableQuantity = 0;
     }
 
     public String getId() {
@@ -97,6 +100,14 @@ public class ItemDto {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public Integer getAvailableQuantity() {
+        return availableQuantity;
+    }
+
+    public void setAvailableQuantity(Integer availableQuantity) {
+        this.availableQuantity = availableQuantity;
     }
 }
 

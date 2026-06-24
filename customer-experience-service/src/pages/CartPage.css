@@ -124,3 +124,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .cart-page {
+    padding: 24px 16px;
+  }
+  .cart-page__summary {
+    padding: 24px;
+  }
+}
+

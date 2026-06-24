@@ -12,8 +12,8 @@ public class Fulfilment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID orderId;
+    @Column(nullable = false, length = 20)
+    private String orderId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -48,8 +48,8 @@ public class Fulfilment {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public UUID getOrderId() { return orderId; }
-    public void setOrderId(UUID orderId) { this.orderId = orderId; }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 
     public FulfilmentStatus getStatus() { return status; }
     public void setStatus(FulfilmentStatus status) { this.status = status; }

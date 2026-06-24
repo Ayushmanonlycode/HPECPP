@@ -10,13 +10,13 @@ public interface OrderCaptureService {
 
     OrderDto createOrder(CreateOrderDto dto);
 
-    OrderDto getOrder(UUID id);
+    OrderDto getOrder(String id);
 
-    List<OrderDto> getOrdersByUser(UUID userId);
+    List<OrderDto> getOrdersByUser(String userId);
 
-    OrderDto confirmOrder(UUID id);
+    OrderDto confirmOrder(String id);
 
-    OrderDto cancelOrder(UUID id);
+    OrderDto cancelOrder(String id);
 
     List<OrderDto> listAllOrders();
 }

@@ -6,7 +6,7 @@ import java.util.UUID;
 public class FulfilmentDto {
 
     private UUID id;
-    private UUID orderId;
+    private String orderId;
     private String status;
     private String trackingNumber;
     private String carrier;
@@ -21,8 +21,8 @@ public class FulfilmentDto {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public UUID getOrderId() { return orderId; }
-    public void setOrderId(UUID orderId) { this.orderId = orderId; }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

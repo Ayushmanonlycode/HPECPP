@@ -109,3 +109,22 @@
   color: var(--text-primary);
 }
 
+@media (max-width: 768px) {
+  .product-detail {
+    padding-top: 24px;
+    padding-bottom: 48px;
+  }
+  
+  .product-detail__title {
+    font-size: 1.75rem;
+  }
+  
+  .product-detail__items-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-detail__item-card {
+    padding: 24px;
+  }
+}
+

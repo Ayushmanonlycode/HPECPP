@@ -45,7 +45,7 @@ public class OrderFulfilmentServiceImpl implements OrderFulfilmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public FulfilmentDto getFulfilmentByOrder(UUID orderId) {
+    public FulfilmentDto getFulfilmentByOrder(String orderId) {
         Fulfilment fulfilment = fulfilmentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Fulfilment for order", orderId));
         return toDto(fulfilment);

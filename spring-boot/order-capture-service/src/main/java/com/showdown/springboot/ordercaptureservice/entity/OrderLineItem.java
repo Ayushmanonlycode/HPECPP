@@ -9,8 +9,8 @@ import java.util.UUID;
 public class OrderLineItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(length = 20)
+    private String id;
 
     @Column(nullable = false)
     private String itemSku;
@@ -33,14 +33,21 @@ public class OrderLineItem {
     public OrderLineItem() {
     }
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null) {
+            this.id = "OLI-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
+    }
+
     public void calculateLineTotal() {
         this.lineTotal = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
     }
 
     // ── Getters and Setters ──────────────────────────────────────
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getItemSku() { return itemSku; }
     public void setItemSku(String itemSku) { this.itemSku = itemSku; }

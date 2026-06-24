@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface FulfilmentRepository extends JpaRepository<Fulfilment, UUID> {
 
-    Optional<Fulfilment> findByOrderId(UUID orderId);
+    Optional<Fulfilment> findByOrderId(String orderId);
 
     List<Fulfilment> findByStatus(FulfilmentStatus status);
 }

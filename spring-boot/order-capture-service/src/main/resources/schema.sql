@@ -1,8 +1,9 @@
 -- Order Capture Service Schema
 
 CREATE TABLE IF NOT EXISTS orders (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
+    id VARCHAR(20) PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'CREATED',
     total_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
     shipping_address VARCHAR(500),
@@ -11,8 +12,8 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 CREATE TABLE IF NOT EXISTS order_line_items (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id UUID NOT NULL,
+    id VARCHAR(20) PRIMARY KEY,
+    order_id VARCHAR(20) NOT NULL,
     item_sku VARCHAR(255) NOT NULL,
     product_name VARCHAR(255),
     quantity INTEGER NOT NULL,

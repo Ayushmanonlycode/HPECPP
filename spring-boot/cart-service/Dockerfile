@@ -1,7 +1,7 @@
 FROM maven:3.9.7-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 COPY . .
-RUN mvn clean package -pl cart-service -am -DskipTests -q
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -pl cart-service -am -DskipTests -q
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app

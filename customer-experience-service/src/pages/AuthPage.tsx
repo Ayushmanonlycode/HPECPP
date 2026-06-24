@@ -47,8 +47,9 @@ export default function AuthPage() {
       const profile = await authApi.login({ username, password });
       login(profile);
       navigate(from, { replace: true });
-    } catch (err: any) {
-      setError(typeof err.message === 'string' ? err.message : 'Login failed');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message;
+      setError(msg ?? 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -73,8 +74,9 @@ export default function AuthPage() {
       });
       login(profile);
       navigate(from, { replace: true });
-    } catch (err: any) {
-      setError(typeof err.message === 'string' ? err.message : 'Sign up failed');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message;
+      setError(msg ?? 'Sign up failed');
     } finally {
       setLoading(false);
     }

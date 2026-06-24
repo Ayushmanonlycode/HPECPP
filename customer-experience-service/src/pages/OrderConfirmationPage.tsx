@@ -17,8 +17,10 @@ export default function OrderConfirmationPage() {
       try {
         const data = await orderApi.getOrder(id);
         setOrder(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load order details');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message
+          : (err as { message?: string })?.message ?? 'Failed to load order details';
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -58,13 +60,13 @@ export default function OrderConfirmationPage() {
 
       <div style={{ background: 'var(--surface-elevated)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 20, marginBottom: 20 }}>
         <h2 style={{ fontSize: '1.1rem', marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>Order Summary</h2>
-        
+
         <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '12px 24px', fontSize: '0.9rem' }}>
           <div style={{ color: 'var(--text-secondary)' }}>Order ID</div>
           <div style={{ fontWeight: 600 }}>{order.id}</div>
 
           <div style={{ color: 'var(--text-secondary)' }}>Customer</div>
-          <div>{order.userId}</div>
+          <div>{order.customerName}</div>
 
           <div style={{ color: 'var(--text-secondary)' }}>Address</div>
           <div style={{ lineHeight: 1.5 }}>{order.shippingAddress}</div>

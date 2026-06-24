@@ -11,15 +11,30 @@ export function useProduct(productId: string) {
   useEffect(() => {
     if (!productId) return;
     let cancelled = false;
-    setLoading(true);
-    setError(null);
-    Promise.all([
-      catalogApi.getProduct(productId),
-      catalogApi.getItems(productId),
-    ])
-      .then(([p, i]) => { if (!cancelled) { setProduct(p); setItems(i); } })
-      .catch((err) => { if (!cancelled) setError(err.message ?? 'Failed to load product'); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+
+    const fetch = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [p, i] = await Promise.all([
+          catalogApi.getProduct(productId),
+          catalogApi.getItems(productId),
+        ]);
+        if (!cancelled) {
+          setProduct(p);
+          setItems(i);
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const msg = err instanceof Error ? err.message : (err as { message?: string })?.message;
+          setError(msg ?? 'Failed to load product');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    void fetch();
     return () => { cancelled = true; };
   }, [productId]);
 

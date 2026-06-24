@@ -12,11 +12,14 @@ import java.util.UUID;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(length = 20)
+    private String id;
 
-    @Column(nullable = false)
-    private UUID userId;
+    @Column(nullable = false, length = 50)
+    private String userId;
+
+    @Column(nullable = false, length = 255)
+    private String customerName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -38,6 +41,9 @@ public class Order {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null) {
+            this.id = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
@@ -52,11 +58,14 @@ public class Order {
 
     // ── Getters and Setters ──────────────────────────────────────
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
 
     public OrderStatus getStatus() { return status; }
     public void setStatus(OrderStatus status) { this.status = status; }

@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.showdown.springboot.ordercaptureservice.client.InventoryClient;
+import com.showdown.springboot.ordercaptureservice.client.OrderFulfilmentClient;
+import com.showdown.springboot.ordercaptureservice.client.UserClient;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -31,18 +34,28 @@ public class OrderCaptureServiceImplTest {
     @Mock
     private OrderRepository orderRepository;
 
+    @Mock
+    private InventoryClient inventoryClient;
+
+    @Mock
+    private OrderFulfilmentClient orderFulfilmentClient;
+
+    @Mock
+    private UserClient userClient;
+
     private OrderCaptureServiceImpl orderCaptureService;
 
     @BeforeEach
     void setUp() {
-        orderCaptureService = new OrderCaptureServiceImpl(orderRepository);
+        orderCaptureService = new OrderCaptureServiceImpl(orderRepository, inventoryClient, orderFulfilmentClient, userClient);
     }
 
     @Test
     void createOrder_shouldCalculateTotalAndSaveOrder() {
-        UUID userId = UUID.randomUUID();
+        String userId = "user-123";
         CreateOrderDto createDto = new CreateOrderDto();
         createDto.setUserId(userId);
+        createDto.setCustomerName("John Doe");
         createDto.setShippingAddress("123 Main St");
 
         OrderLineItemDto item1 = new OrderLineItemDto();
@@ -59,9 +72,12 @@ public class OrderCaptureServiceImplTest {
 
         createDto.setLineItems(List.of(item1, item2));
 
+        when(userClient.checkUserExists(anyString())).thenReturn(true);
+        when(inventoryClient.reserveStock(anyString(), anyInt())).thenReturn(true);
+
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order savedOrder = invocation.getArgument(0);
-            savedOrder.setId(UUID.randomUUID());
+            savedOrder.setId("ORD-1234");
             return savedOrder;
         });
 
@@ -69,15 +85,31 @@ public class OrderCaptureServiceImplTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getId()).isNotNull();
+        assertThat(result.getCustomerName()).isEqualTo("John Doe");
         assertThat(result.getStatus()).isEqualTo(OrderStatus.CREATED.name());
         assertThat(result.getShippingAddress()).isEqualTo("123 Main St");
-        assertThat(result.getTotalAmount()).isEqualByComparingTo(new BigDecimal("65.00")); // 2*10 + 3*15
+        
+        // subtotal 65.00, tax 5.525, shipping 15.00
+        BigDecimal expectedTotal = new BigDecimal("65.00").add(new BigDecimal("15.00")).add(new BigDecimal("65.00").multiply(new BigDecimal("0.085")));
+        assertThat(result.getTotalAmount()).isEqualByComparingTo(expectedTotal);
         assertThat(result.getLineItems()).hasSize(2);
     }
 
     @Test
+    void createOrder_whenUserNotFound_shouldThrowInvalidOrderException() {
+        CreateOrderDto createDto = new CreateOrderDto();
+        createDto.setUserId("invalid-user");
+        
+        when(userClient.checkUserExists("invalid-user")).thenReturn(false);
+
+        assertThatThrownBy(() -> orderCaptureService.createOrder(createDto))
+                .isInstanceOf(InvalidOrderException.class)
+                .hasMessageContaining("Invalid user ID");
+    }
+
+    @Test
     void confirmOrder_whenStatusIsCreated_shouldConfirmOrder() {
-        UUID orderId = UUID.randomUUID();
+        String orderId = "ORD-1234";
         Order order = new Order();
         order.setId(orderId);
         order.setStatus(OrderStatus.CREATED);
@@ -94,7 +126,7 @@ public class OrderCaptureServiceImplTest {
 
     @Test
     void confirmOrder_whenStatusIsNotCreated_shouldThrowInvalidOrderException() {
-        UUID orderId = UUID.randomUUID();
+        String orderId = "ORD-1234";
         Order order = new Order();
         order.setId(orderId);
         order.setStatus(OrderStatus.CANCELLED);
@@ -108,7 +140,7 @@ public class OrderCaptureServiceImplTest {
 
     @Test
     void cancelOrder_whenStatusIsCreated_shouldCancelOrder() {
-        UUID orderId = UUID.randomUUID();
+        String orderId = "ORD-1234";
         Order order = new Order();
         order.setId(orderId);
         order.setStatus(OrderStatus.CREATED);
@@ -123,7 +155,7 @@ public class OrderCaptureServiceImplTest {
 
     @Test
     void cancelOrder_whenAlreadyCancelled_shouldThrowInvalidOrderException() {
-        UUID orderId = UUID.randomUUID();
+        String orderId = "ORD-1234";
         Order order = new Order();
         order.setId(orderId);
         order.setStatus(OrderStatus.CANCELLED);
@@ -137,7 +169,7 @@ public class OrderCaptureServiceImplTest {
 
     @Test
     void getOrder_whenNotExists_shouldThrowResourceNotFoundException() {
-        UUID orderId = UUID.randomUUID();
+        String orderId = "ORD-1234";
         when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> orderCaptureService.getOrder(orderId))

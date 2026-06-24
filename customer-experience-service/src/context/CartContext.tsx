@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { Cart, AddToCartRequest } from '../types/api';
 import { cartApi } from '../services/cartApi';
 import { useAuth } from './AuthContext';
@@ -24,13 +24,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   // Helper to load guest cart from local storage
-  const getGuestCart = (): Cart => {
+  const getGuestCart = useCallback((): Cart => {
     const stored = localStorage.getItem(GUEST_CART_KEY);
     if (stored) {
-      try { return JSON.parse(stored); } catch { /* ignore */ }
+      try { return JSON.parse(stored) as Cart; } catch { /* ignore */ }
     }
     return { userId: userId || 'guest', items: [], itemCount: 0, total: 0 };
-  };
+  }, [userId]);
 
   const saveGuestCart = (newCart: Cart) => {
     newCart.itemCount = newCart.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -39,12 +39,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart({ ...newCart });
   };
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     if (!isAuthenticated || !userId) {
       setCart(getGuestCart());
       return;
     }
-    
+
     setLoading(true);
     try {
       // If user just logged in and has a guest cart, merge it first
@@ -68,11 +68,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, isAuthenticated, getGuestCart]);
 
   useEffect(() => {
-    refresh();
-  }, [userId, isAuthenticated]);
+    // refresh is fully async — setState calls happen asynchronously, not synchronously in the effect body
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refresh();
+  }, [refresh]);
 
   const addItem = async (item: AddToCartRequest) => {
     if (!isAuthenticated || !userId) {
@@ -157,6 +159,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCartContext(): CartState {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCartContext must be used within CartProvider');

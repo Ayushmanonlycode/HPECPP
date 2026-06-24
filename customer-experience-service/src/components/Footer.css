@@ -65,3 +65,30 @@
   color: var(--text-primary);
   opacity: 1;
 }
+
+@media (max-width: 768px) {
+  .footer__inner {
+    flex-direction: column-reverse;
+    gap: 24px;
+    height: auto;
+    padding: 32px 16px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .footer__right {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .footer__copy {
+    white-space: normal;
+    line-height: 1.5;
+  }
+
+  .footer__links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+}
