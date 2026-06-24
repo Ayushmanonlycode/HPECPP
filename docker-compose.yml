@@ -33,7 +33,7 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.101.0
     container_name: otel-collector
-    profiles: [observability, spring, wildfly]
+    profiles: [observability]
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
       - ./observability/otel-collector/otel-collector-config.yml:/etc/otel-collector-config.yml
@@ -47,7 +47,7 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:1.57
     container_name: jaeger
-    profiles: [observability, spring, wildfly]
+    profiles: [observability]
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
     ports:
@@ -58,7 +58,7 @@ services:
   prometheus:
     image: prom/prometheus:v2.51.2
     container_name: prometheus
-    profiles: [observability, spring, wildfly]
+    profiles: [observability]
     volumes:
       - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
@@ -69,7 +69,7 @@ services:
   grafana:
     image: grafana/grafana:10.4.2
     container_name: grafana
-    profiles: [observability, spring, wildfly]
+    profiles: [observability]
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
@@ -83,7 +83,7 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
-    profiles: [observability, spring, wildfly]
+    profiles: [observability]
     privileged: true
     volumes:
       - /:/rootfs:ro
@@ -207,7 +207,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-user-db:5432/userdb
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-user-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -217,7 +217,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8081:8081"
-    depends_on: [sb-user-db, otel-agent-init, otel-collector]
+    depends_on: [sb-user-db, otel-agent-init]
     networks: [showdown-net]
 
   sb-catalog-service:
@@ -233,7 +233,7 @@ services:
       KEYCLOAK_URL: http://keycloak:8080
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
       SERVICES_INVENTORY_URL: http://sb-inventory-service:8083
-      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-catalog-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -243,7 +243,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8082:8082"
-    depends_on: [sb-catalog-db, otel-agent-init, otel-collector]
+    depends_on: [sb-catalog-db, otel-agent-init]
     networks: [showdown-net]
 
   sb-inventory-service:
@@ -257,7 +257,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       KEYCLOAK_URL: http://keycloak:8080
-      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-inventory-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -267,7 +267,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8083:8083"
-    depends_on: [sb-inventory-db, otel-agent-init, otel-collector]
+    depends_on: [sb-inventory-db, otel-agent-init]
     networks: [showdown-net]
 
   sb-order-capture-service:
@@ -285,7 +285,7 @@ services:
       SERVICES_INVENTORY_URL: http://sb-inventory-service:8083
       SERVICES_FULFILMENT_URL: http://sb-order-fulfilment-service:8085
       SERVICES_USER_URL: http://sb-user-service:8081
-      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-order-capture-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -295,7 +295,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8084:8084"
-    depends_on: [sb-order-capture-db, otel-agent-init, otel-collector]
+    depends_on: [sb-order-capture-db, otel-agent-init]
     networks: [showdown-net]
 
   sb-order-fulfilment-service:
@@ -309,7 +309,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       KEYCLOAK_URL: http://keycloak:8080
-      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-order-fulfilment-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -319,7 +319,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8085:8085"
-    depends_on: [sb-order-fulfilment-db, otel-agent-init, otel-collector]
+    depends_on: [sb-order-fulfilment-db, otel-agent-init]
     networks: [showdown-net]
 
   sb-cart-service:
@@ -331,7 +331,7 @@ services:
     environment:
       SPRING_DATA_REDIS_HOST: sb-cart-db
       KEYCLOAK_URL: http://keycloak:8080
-      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-cart-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -341,7 +341,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8086:8086"
-    depends_on: [sb-cart-db, otel-agent-init, otel-collector]
+    depends_on: [sb-cart-db, otel-agent-init]
     networks: [showdown-net]
 
   # ── WildFly Databases ─────────────────────────────────────────

@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('userId');
+    localStorage.removeItem('token');
   };
 
   const userId = user?.id ?? localStorage.getItem('userId') ?? getOrCreateGuestId();

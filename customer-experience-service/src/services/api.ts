@@ -5,11 +5,15 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach userId header from localStorage on every request
+// Attach userId and Authorization header from localStorage on every request
 api.interceptors.request.use((config) => {
   const userId = localStorage.getItem('userId');
   if (userId) {
     config.headers['X-User-Id'] = userId;
+  }
+  const token = localStorage.getItem('token');
+  if (token && config.url?.startsWith('/api/users')) {
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
   return config;
 });

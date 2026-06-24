@@ -5,8 +5,11 @@ import api from './api';
 export const authApi = {
   login: async (dto: LoginRequest): Promise<UserProfile> => {
     // When real auth is available, this will POST to /api/users/login
-    const res = await api.post<UserProfile>('/api/users/login', dto);
-    return res.data;
+    const res = await api.post<{ token: string; tokenType: string; user: UserProfile }>('/api/users/login', dto);
+    if (res.data.token) {
+      localStorage.setItem('token', res.data.token);
+    }
+    return res.data.user;
   },
 
   register: async (dto: RegisterRequest): Promise<UserProfile> => {
