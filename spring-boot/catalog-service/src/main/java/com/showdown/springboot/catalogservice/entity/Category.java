@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 public class Category {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false, unique = true)

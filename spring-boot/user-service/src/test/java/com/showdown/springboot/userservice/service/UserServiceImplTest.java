@@ -1,5 +1,6 @@
 package com.showdown.springboot.userservice.service;
 
+import com.showdown.springboot.userservice.dto.AuthResponseDto;
 import com.showdown.springboot.userservice.dto.UserLoginDto;
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserRegistrationDto;
@@ -7,11 +8,13 @@ import com.showdown.springboot.userservice.entity.User;
 import com.showdown.springboot.userservice.exception.DuplicateResourceException;
 import com.showdown.springboot.userservice.exception.ResourceNotFoundException;
 import com.showdown.springboot.userservice.repository.UserRepository;
+import com.showdown.springboot.userservice.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -27,11 +30,17 @@ public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository);
+        userService = new UserServiceImpl(userRepository, passwordEncoder, jwtTokenProvider);
     }
 
     @Test
@@ -47,10 +56,11 @@ public class UserServiceImplTest {
         savedUser.setId(UUID.randomUUID());
         savedUser.setUsername("john_doe");
         savedUser.setEmail("john@example.com");
-        savedUser.setPassword("secret");
+        savedUser.setPassword("hashed_secret");
         savedUser.setFirstName("John");
         savedUser.setLastName("Doe");
 
+        when(passwordEncoder.encode("secret")).thenReturn("hashed_secret");
         when(userRepository.existsByUsername("john_doe")).thenReturn(false);
         when(userRepository.existsByEmail("john@example.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -99,14 +109,17 @@ public class UserServiceImplTest {
         User user = new User();
         user.setId(UUID.randomUUID());
         user.setUsername("john_doe");
-        user.setPassword("secret");
+        user.setPassword("hashed_secret");
 
         when(userRepository.findByUsername("john_doe")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("secret", "hashed_secret")).thenReturn(true);
+        when(jwtTokenProvider.generateToken("john_doe")).thenReturn("dummy_jwt");
 
-        UserProfileDto result = userService.login(loginDto);
+        AuthResponseDto result = userService.login(loginDto);
 
         assertThat(result).isNotNull();
-        assertThat(result.getUsername()).isEqualTo("john_doe");
+        assertThat(result.getToken()).isEqualTo("dummy_jwt");
+        assertThat(result.getUser().getUsername()).isEqualTo("john_doe");
     }
 
     @Test
@@ -117,9 +130,10 @@ public class UserServiceImplTest {
 
         User user = new User();
         user.setUsername("john_doe");
-        user.setPassword("secret");
+        user.setPassword("hashed_secret");
 
         when(userRepository.findByUsername("john_doe")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong", "hashed_secret")).thenReturn(false);
 
         assertThatThrownBy(() -> userService.login(loginDto))
                 .isInstanceOf(IllegalArgumentException.class)

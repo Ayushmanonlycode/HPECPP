@@ -1,5 +1,6 @@
 package com.showdown.springboot.userservice.controller;
 
+import com.showdown.springboot.userservice.dto.AuthResponseDto;
 import com.showdown.springboot.userservice.dto.UserLoginDto;
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserRegistrationDto;
