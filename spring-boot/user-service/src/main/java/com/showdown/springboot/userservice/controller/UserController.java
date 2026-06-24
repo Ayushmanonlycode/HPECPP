@@ -40,9 +40,9 @@ public class UserController {
     @Operation(summary = "Login with username and password", description = "Validates credentials. Public endpoint. For JWT auth use Keycloak token endpoint.")
     @ApiResponse(responseCode = "200", description = "Login successful")
     @ApiResponse(responseCode = "401", description = "Invalid credentials")
-    public ResponseEntity<UserProfileDto> login(@Valid @RequestBody UserLoginDto dto) {
-        UserProfileDto profile = userService.login(dto);
-        return ResponseEntity.ok(profile);
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginDto dto) {
+        AuthResponseDto response = userService.login(dto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping

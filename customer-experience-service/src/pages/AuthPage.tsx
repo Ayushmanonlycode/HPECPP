@@ -64,7 +64,7 @@ export default function AuthPage() {
     setLoading(true);
     setError(null);
     try {
-      const profile = await authApi.register({
+      await authApi.register({
         username: signupUsername,
         firstName,
         lastName,
@@ -72,6 +72,10 @@ export default function AuthPage() {
         email,
         password: signupPassword,
       });
+      
+      // Automatically login to retrieve the JWT token and save it to localStorage
+      const profile = await authApi.login({ username: signupUsername, password: signupPassword });
+      
       login(profile);
       navigate(from, { replace: true });
     } catch (err: unknown) {
