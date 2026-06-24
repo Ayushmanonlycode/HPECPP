@@ -1,0 +1,74 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak JWKS endpoint — override via KEYCLOAK_URL env var in Docker
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8180}/realms/jpetstore
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: user-service
+          uri: ${GATEWAY_USER_SERVICE:http://localhost:8081}
+          predicates:
+            - Path=/api/users/**
+        
+        - id: catalog-service-categories
+          uri: ${GATEWAY_CATALOG_SERVICE:http://localhost:8082}
+          predicates:
+            - Path=/api/categories/**
+            
+        - id: catalog-service-products
+          uri: ${GATEWAY_CATALOG_SERVICE:http://localhost:8082}
+          predicates:
+            - Path=/api/products/**
+            
+        - id: catalog-service-items
+          uri: ${GATEWAY_CATALOG_SERVICE:http://localhost:8082}
+          predicates:
+            - Path=/api/items/**
+            
+        - id: inventory-service
+          uri: ${GATEWAY_INVENTORY_SERVICE:http://localhost:8083}
+          predicates:
+            - Path=/api/inventory/**
+            
+        - id: order-capture-service
+          uri: ${GATEWAY_ORDER_CAPTURE_SERVICE:http://localhost:8084}
+          predicates:
+            - Path=/api/orders/**
+            
+        - id: order-fulfilment-service
+          uri: ${GATEWAY_ORDER_FULFILMENT_SERVICE:http://localhost:8085}
+          predicates:
+            - Path=/api/fulfilments/**
+            
+        - id: cart-service
+          uri: ${GATEWAY_CART_SERVICE:http://localhost:8086}
+          predicates:
+            - Path=/api/cart/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}

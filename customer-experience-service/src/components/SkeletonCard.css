@@ -1,0 +1,32 @@
+/* ── Skeleton Card ──────────────────────────────────────── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+}
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-card__image {
+  aspect-ratio: 1 / 1;
+  background: var(--bg-alt);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-card__line {
+  height: 12px;
+  background: var(--bg-alt);
+  margin-top: 12px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-card__line--short {
+  width: 60%;
+}
+
+.skeleton-card__line--price {
+  width: 30%;
+  margin-top: 8px;
+}

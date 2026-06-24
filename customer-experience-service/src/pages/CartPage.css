@@ -1,0 +1,135 @@
+.cart-page {
+  padding: 48px 32px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.cart-page__loading,
+.cart-page__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.cart-page__header {
+  margin-bottom: 48px;
+}
+
+.cart-page__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.cart-page__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.cart-page__layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 64px;
+  align-items: stretch;
+}
+
+.cart-page__items {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.cart-page__summary-wrapper {
+  position: sticky;
+  top: 104px;
+  align-self: flex-start;
+}
+
+.cart-page__summary {
+  border: 1px solid var(--border);
+  padding: 32px;
+}
+
+.cart-page__summary-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.cart-page__summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.cart-page__summary-value--muted {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.cart-page__summary-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+.cart-page__summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.cart-page__summary-total-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cart-page__secure-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 24px;
+}
+
+@media (max-width: 900px) {
+  .cart-page__layout {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .cart-page__summary-wrapper {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-page {
+    padding: 24px 16px;
+  }
+  .cart-page__summary {
+    padding: 24px;
+  }
+}
+
