@@ -159,14 +159,16 @@ services:
       - "5434:5432"
     networks: [showdown-net]
 
-  sb-order-fulfilment-db:
+  sb-order-fulfillment-db:
     image: postgres:16-alpine
-    container_name: sb-order-fulfilment-db
+    container_name: sb-order-fulfillment-db
     profiles: [spring]
     environment:
+
       POSTGRES_DB: orderfulfilmentdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+
     ports:
       - "5435:5432"
     networks: [showdown-net]
@@ -298,6 +300,7 @@ services:
     depends_on: [sb-order-capture-db, otel-agent-init]
     networks: [showdown-net]
 
+
   sb-order-fulfilment-service:
     build:
       context: ./spring-boot
@@ -319,6 +322,7 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8085:8085"
+
     depends_on: [sb-order-fulfilment-db, otel-agent-init]
     networks: [showdown-net]
 
@@ -393,48 +397,114 @@ services:
       - "5444:5432"
     networks: [showdown-net]
 
-  wf-order-fulfilment-db:
+  wf-order-fulfillment-db:
     image: postgres:16-alpine
-    container_name: wf-order-fulfilment-db
+    container_name: wf-order-fulfillment-db
     profiles: [wildfly]
     environment:
+
       POSTGRES_DB: orderfulfilmentdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+
     ports:
       - "5445:5432"
     networks: [showdown-net]
 
-  wf-cart-db:
+# ── Redis Master ──────────────────────────────────────────────
+  wf-cart-db-master:  
     image: redis:7-alpine
-    container_name: wf-cart-db
+    container_name: wf-cart-db-master
     profiles: [wildfly]
+    command: redis-server --save 60 1 --loglevel warning
     ports:
-      - "6380:6379"
+      - "6379:6379"
+    networks: [showdown-net]
+
+  wf-cart-db-replica-1:
+    image: redis:7-alpine
+    container_name: wf-cart-db-replica-1
+    profiles: [wildfly]
+    command: redis-server --replicaof wf-cart-db-master 6379
+    depends_on: [wf-cart-db-master]
+    networks: [showdown-net]
+
+  wf-cart-db-replica-2:
+    image: redis:7-alpine
+    container_name: wf-cart-db-replica-2
+    profiles: [wildfly]
+    command: redis-server --replicaof wf-cart-db-master 6379
+    depends_on: [wf-cart-db-master]
+    networks: [showdown-net]
+
+  # ── Redis Sentinels ───────────────────────────────────────────
+  wf-cart-sentinel-1:
+    image: redis:7-alpine
+    container_name: wf-cart-sentinel-1
+    profiles: [wildfly]
+    command: >
+      sh -c "sleep 15 &&
+         echo 'sentinel monitor mymaster 172.18.0.2 6379 2' > /sentinel.conf &&
+         echo 'sentinel down-after-milliseconds mymaster 5000' >> /sentinel.conf &&
+         echo 'sentinel failover-timeout mymaster 10000' >> /sentinel.conf &&
+         echo 'sentinel parallel-syncs mymaster 1' >> /sentinel.conf &&
+         redis-sentinel /sentinel.conf"
+    depends_on: [wf-cart-db-master]
+    networks: [showdown-net]
+    ports:
+      - "26379:26379"
+
+  wf-cart-sentinel-2:
+    image: redis:7-alpine
+    container_name: wf-cart-sentinel-2
+    profiles: [wildfly]
+    command: >
+        sh -c "sleep 15 &&
+         echo 'sentinel monitor mymaster 172.18.0.2 6379 2' > /sentinel.conf &&
+         echo 'sentinel down-after-milliseconds mymaster 5000' >> /sentinel.conf &&
+         echo 'sentinel failover-timeout mymaster 10000' >> /sentinel.conf &&
+         echo 'sentinel parallel-syncs mymaster 1' >> /sentinel.conf &&
+         redis-sentinel /sentinel.conf"
+    depends_on: [wf-cart-db-master]
+    networks: [showdown-net]
+    ports:
+      - "26380:26379"
+
+  wf-cart-sentinel-3:
+    image: redis:7-alpine
+    container_name: wf-cart-sentinel-3
+    profiles: [wildfly]
+    command: >
+        sh -c "sleep 15 &&
+         echo 'sentinel monitor mymaster 172.18.0.2 6379 2' > /sentinel.conf &&
+         echo 'sentinel down-after-milliseconds mymaster 5000' >> /sentinel.conf &&
+         echo 'sentinel failover-timeout mymaster 10000' >> /sentinel.conf &&
+         echo 'sentinel parallel-syncs mymaster 1' >> /sentinel.conf &&
+         redis-sentinel /sentinel.conf"
+    depends_on: [wf-cart-db-master]
+    networks: [showdown-net]
+    ports:
+      - "26381:26379"
+
+  wf-cart-service:
+    build:
+      context: ./wildfly-microprofile
+      dockerfile: cart-service/Dockerfile
+    container_name: wf-cart-service
+    profiles: [wildfly]
+    environment:
+      REDIS_SENTINEL_HOSTS: wf-cart-sentinel-1:26379,wf-cart-sentinel-2:26379,wf-cart-sentinel-3:26379
+      REDIS_MASTER_NAME: mymaster
+    ports:
+      - "9086:8080"
+    depends_on: [wf-cart-sentinel-1, wf-cart-sentinel-2, wf-cart-sentinel-3]
     networks: [showdown-net]
 
   # ── WildFly Services ──────────────────────────────────────────
-  wf-api-gateway:
-    build:
-      context: ./wildfly-microprofile
-      dockerfile: ./api-gateway/Dockerfile
-    container_name: wf-api-gateway
-    profiles: [wildfly]
-    environment:
-      GATEWAY_USER_SERVICE: http://wf-user-service:8080
-      GATEWAY_CATALOG_SERVICE: http://wf-catalog-service:8080
-      GATEWAY_INVENTORY_SERVICE: http://wf-inventory-service:8080
-      GATEWAY_ORDER_CAPTURE_SERVICE: http://wf-order-capture-service:8080
-      GATEWAY_ORDER_FULFILMENT_SERVICE: http://wf-order-fulfilment-service:8080
-      GATEWAY_CART_SERVICE: http://wf-cart-service:8080
-    ports:
-      - "9080:8080"
-    networks: [showdown-net]
-
   wf-user-service:
     build:
       context: ./wildfly-microprofile
-      dockerfile: ./user-service/Dockerfile
+      dockerfile: user-service/Dockerfile
     container_name: wf-user-service
     profiles: [wildfly]
     environment:
@@ -449,7 +519,7 @@ services:
   wf-catalog-service:
     build:
       context: ./wildfly-microprofile
-      dockerfile: ./catalog-service/Dockerfile
+      dockerfile: catalog-service/Dockerfile
     container_name: wf-catalog-service
     profiles: [wildfly]
     environment:
@@ -464,7 +534,7 @@ services:
   wf-inventory-service:
     build:
       context: ./wildfly-microprofile
-      dockerfile: ./inventory-service/Dockerfile
+      dockerfile: inventory-service/Dockerfile
     container_name: wf-inventory-service
     profiles: [wildfly]
     environment:
@@ -479,7 +549,7 @@ services:
   wf-order-capture-service:
     build:
       context: ./wildfly-microprofile
-      dockerfile: ./order-capture-service/Dockerfile
+      dockerfile: order-capture-service/Dockerfile
     container_name: wf-order-capture-service
     profiles: [wildfly]
     environment:
@@ -491,31 +561,22 @@ services:
     depends_on: [wf-order-capture-db]
     networks: [showdown-net]
 
-  wf-order-fulfilment-service:
+  wf-order-fulfillment-service:
     build:
       context: ./wildfly-microprofile
-      dockerfile: ./order-fulfilment-service/Dockerfile
-    container_name: wf-order-fulfilment-service
+      dockerfile: order-fulfillment-service/Dockerfile
+    container_name: wf-order-fulfillment-service
     profiles: [wildfly]
     environment:
-      DB_URL: jdbc:postgresql://wf-order-fulfilment-db:5432/orderfulfilmentdb
+      DB_URL: jdbc:postgresql://wf-order-fulfillment-db:5432/orderfulfillmentdb
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+
     ports:
       - "9085:8080"
-    depends_on: [wf-order-fulfilment-db]
+    depends_on: [wf-order-fulfillment-db]
     networks: [showdown-net]
 
-  wf-cart-service:
-    build:
-      context: ./wildfly-microprofile
-      dockerfile: ./cart-service/Dockerfile
-    container_name: wf-cart-service
-    profiles: [wildfly]
-    environment:
-      REDIS_HOST: wf-cart-db
-    ports:
-      - "9086:8080"
-    depends_on: [wf-cart-db]
-    networks: [showdown-net]
+
+
 

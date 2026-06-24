@@ -1,9 +1,32 @@
-FROM maven:3.9.7-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
 WORKDIR /app
 COPY . .
-RUN mvn clean package -pl order-capture-service -am -DskipTests -q
+RUN mvn -pl order-capture-service -am clean package -DskipTests
 
-FROM quay.io/wildfly/wildfly:34.0.1.Final-jdk21
-COPY --from=build /app/order-capture-service/target/*.war $JBOSS_HOME/standalone/deployments/
-EXPOSE 8080 9990
+FROM quay.io/wildfly/wildfly:latest
+USER root
+
+RUN curl -L https://jdbc.postgresql.org/download/postgresql-42.7.3.jar \
+    -o /tmp/postgresql.jar
+
+RUN /opt/jboss/wildfly/bin/jboss-cli.sh --command=\
+"module add \
+  --name=org.postgresql \
+  --resources=/tmp/postgresql.jar \
+  --dependencies=javax.api,java.sql"
+
+RUN /opt/jboss/wildfly/bin/standalone.sh --admin-only & \
+    sleep 10 && \
+    /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="\
+      /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver),\
+      data-source add --name=OrderCaptureDS --jndi-name=java:/OrdersDSP --driver-name=postgresql --connection-url=jdbc:postgresql://wf-order-capture-db:5432/ordercapturedb --user-name=showdown --password=showdown123 --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --validate-on-match=true,\
+      shutdown" && \
+    wait
+
+COPY --from=builder \
+    /app/order-capture-service/target/order-capture-service.war \
+    /opt/jboss/wildfly/standalone/deployments/
+
+EXPOSE 8080
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]
+

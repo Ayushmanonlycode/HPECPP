@@ -17,14 +17,14 @@
         <module>catalog-service</module>
         <module>inventory-service</module>
         <module>order-capture-service</module>
-        <module>order-fulfilment-service</module>
+        <module>order-fulfillment-service</module>
         <module>cart-service</module>
     </modules>
 
     <properties>
-        <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>

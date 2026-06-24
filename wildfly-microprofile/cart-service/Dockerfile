@@ -1,9 +1,15 @@
-FROM maven:3.9.7-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
 WORKDIR /app
 COPY . .
-RUN mvn clean package -pl cart-service -am -DskipTests -q
+RUN mvn -pl cart-service -am clean package -DskipTests
 
-FROM quay.io/wildfly/wildfly:34.0.1.Final-jdk21
-COPY --from=build /app/cart-service/target/*.war $JBOSS_HOME/standalone/deployments/
-EXPOSE 8080 9990
+FROM quay.io/wildfly/wildfly:latest
+USER root
+
+COPY --from=builder \
+    /app/cart-service/target/cart-service.war \
+    /opt/jboss/wildfly/standalone/deployments/
+
+EXPOSE 8080
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]
+
