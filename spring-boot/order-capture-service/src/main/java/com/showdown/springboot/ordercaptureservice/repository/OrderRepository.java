@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, UUID> {
+public interface OrderRepository extends JpaRepository<Order, String> {
 
-    List<Order> findByUserId(UUID userId);
+    List<Order> findByUserId(String userId);
 
     List<Order> findByStatus(OrderStatus status);
 
-    List<Order> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    List<Order> findByUserIdOrderByCreatedAtDesc(String userId);
 }

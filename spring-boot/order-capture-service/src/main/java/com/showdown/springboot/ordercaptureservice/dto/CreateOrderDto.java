@@ -10,7 +10,10 @@ import java.util.UUID;
 public class CreateOrderDto {
 
     @NotNull(message = "User ID is required")
-    private UUID userId;
+    private String userId;
+
+    @NotNull(message = "Customer name is required")
+    private String customerName;
 
     private String shippingAddress;
 
@@ -21,8 +24,11 @@ public class CreateOrderDto {
     public CreateOrderDto() {
     }
 
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
 
     public String getShippingAddress() { return shippingAddress; }
     public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }

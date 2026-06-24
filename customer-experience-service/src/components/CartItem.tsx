@@ -23,8 +23,7 @@ export default function CartItem({ item, categoryName, onRemove, onUpdateQuantit
           <div className="cart-item__qty">
             <button
               className="cart-item__qty-btn"
-              onClick={() => onUpdateQuantity(item.itemSku, item.quantity - 1)}
-              disabled={item.quantity <= 1}
+              onClick={() => item.quantity === 1 ? onRemove(item.itemSku) : onUpdateQuantity(item.itemSku, item.quantity - 1)}
               aria-label="Decrease quantity"
             >−</button>
             <span className="cart-item__qty-val">{item.quantity}</span>

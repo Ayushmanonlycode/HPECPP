@@ -1,16 +1,16 @@
 package com.showdown.springboot.orderfulfilmentservice.dto;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
+
 
 public class CreateFulfilmentDto {
 
     @NotNull(message = "Order ID is required")
-    private UUID orderId;
+    private String orderId;
 
     public CreateFulfilmentDto() {
     }
 
-    public UUID getOrderId() { return orderId; }
-    public void setOrderId(UUID orderId) { this.orderId = orderId; }
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
 }

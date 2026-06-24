@@ -37,7 +37,7 @@ public class OrderFulfilmentServiceImplTest {
 
     @Test
     void createFulfilment_shouldSaveAsPending() {
-        UUID orderId = UUID.randomUUID();
+        String orderId = "ORD-TEST";
         CreateFulfilmentDto dto = new CreateFulfilmentDto();
         dto.setOrderId(orderId);
 

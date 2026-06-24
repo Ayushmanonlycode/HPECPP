@@ -23,6 +23,7 @@ export interface Item {
   imageUrl: string | null;
   productId: string;
   productName: string;
+  availableQuantity?: number;
 }
 
 // ── Cart ──────────────────────────────────────────────────
@@ -62,9 +63,10 @@ export interface OrderLineItem {
 export interface Order {
   id: string;
   userId: string;
-  status: 'CREATED' | 'CONFIRMED' | 'CANCELLED';
+  customerName: string;
+  status: 'CREATED' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   totalAmount: number;
-  shippingAddress: string | null;
+  shippingAddress: string;
   createdAt: string;
   updatedAt: string;
   lineItems: OrderLineItem[];
@@ -72,6 +74,7 @@ export interface Order {
 
 export interface CreateOrderRequest {
   userId: string;
+  customerName: string;
   shippingAddress: string;
   lineItems: {
     itemSku: string;

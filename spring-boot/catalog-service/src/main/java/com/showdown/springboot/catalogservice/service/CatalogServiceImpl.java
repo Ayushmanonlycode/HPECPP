@@ -10,6 +10,7 @@ import com.showdown.springboot.catalogservice.exception.ResourceNotFoundExceptio
 import com.showdown.springboot.catalogservice.repository.CategoryRepository;
 import com.showdown.springboot.catalogservice.repository.ItemRepository;
 import com.showdown.springboot.catalogservice.repository.ProductRepository;
+import com.showdown.springboot.catalogservice.client.InventoryClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +25,16 @@ public class CatalogServiceImpl implements CatalogService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ItemRepository itemRepository;
+    private final InventoryClient inventoryClient;
 
     public CatalogServiceImpl(CategoryRepository categoryRepository,
                               ProductRepository productRepository,
-                              ItemRepository itemRepository) {
+                              ItemRepository itemRepository,
+                              InventoryClient inventoryClient) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.itemRepository = itemRepository;
+        this.inventoryClient = inventoryClient;
     }
 
     // ── Categories ───────────────────────────────────────────────
@@ -240,7 +244,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     private ItemDto toItemDto(Item entity) {
-        return new ItemDto(
+        ItemDto dto = new ItemDto(
                 entity.getId(),
                 entity.getSku(),
                 entity.getListPrice(),
@@ -249,6 +253,8 @@ public class CatalogServiceImpl implements CatalogService {
                 entity.getProduct().getId(),
                 entity.getProduct().getName()
         );
+        dto.setAvailableQuantity(inventoryClient.getAvailableQuantity(entity.getSku()));
+        return dto;
     }
 }
 

@@ -100,20 +100,21 @@
 
 .navbar__badge {
   position: absolute;
-  top: 4px;
-  right: 2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
+  top: -2px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
   background: var(--text-primary);
   color: var(--text-inverse);
   font-size: 0.6rem;
-  font-weight: 700;
-  border-radius: 9px;
+  font-weight: 800;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  border: 2px solid var(--bg);
 }
 
 .navbar__user {
@@ -128,4 +129,98 @@
   color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.navbar__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px;
+  min-width: 120px;
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar__dropdown-item {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+  border-radius: 2px;
+}
+
+.navbar__dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar__hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  padding: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .navbar__inner {
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+  .navbar__hamburger {
+    display: block;
+    margin-left: -8px;
+  }
+
+  .navbar__nav {
+    display: none; /* Hide default nav */
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 24px;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .navbar__nav--open {
+    display: flex;
+  }
+
+  .navbar__nav-link {
+    font-size: 1.1rem;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .navbar__nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .navbar__actions {
+    gap: 4px;
+  }
+
+  .navbar__search-wrap {
+    display: none; /* Can be shown on focus or expanded, but hidden for space initially, or just make it an icon */
+  }
+
+  .navbar__username {
+    display: none; /* Hide username text, just show icon */
+  }
 }

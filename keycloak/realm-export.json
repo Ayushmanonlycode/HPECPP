@@ -1,0 +1,72 @@
+{
+  "realm": "jpetstore",
+  "enabled": true,
+  "displayName": "JPetStore",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": false,
+  "accessTokenLifespan": 3600,
+  "clients": [
+    {
+      "clientId": "jpetstore-gateway",
+      "name": "JPetStore API Gateway",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "jpetstore-secret-changeme",
+      "redirectUris": ["http://localhost:8080/*"],
+      "webOrigins": ["http://localhost:8080"],
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "directAccessGrantsEnabled": true
+    },
+    {
+      "clientId": "jpetstore-frontend",
+      "name": "JPetStore Frontend (Public)",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["http://localhost:5173/*", "http://localhost:3001/*"],
+      "webOrigins": ["http://localhost:5173", "http://localhost:3001"],
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true
+    }
+  ],
+  "roles": {
+    "realm": [
+      { "name": "CUSTOMER", "description": "Standard pet store customer" },
+      { "name": "ADMIN", "description": "Store administrator" }
+    ]
+  },
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "email": "testuser@jpetstore.local",
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "testpass123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CUSTOMER"]
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@jpetstore.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN", "CUSTOMER"]
+    }
+  ]
+}

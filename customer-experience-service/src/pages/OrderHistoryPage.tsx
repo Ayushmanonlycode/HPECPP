@@ -14,11 +14,25 @@ export default function OrderHistoryPage() {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    setLoading(true);
-    orderApi.getUserOrders(userId)
-      .then(data => { if (!cancelled) setOrders(data); })
-      .catch(err => { if (!cancelled) setError(err.message || 'Failed to load orders'); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+
+    const fetchOrders = async () => {
+      // setLoading is called inside the async function, not synchronously in the effect body
+      setLoading(true);
+      try {
+        const data = await orderApi.getUserOrders(userId);
+        if (!cancelled) setOrders(data);
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message
+            : (err as { message?: string })?.message ?? 'Failed to load orders';
+          setError(message);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchOrders();
     return () => { cancelled = true; };
   }, [userId]);
 

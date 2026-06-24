@@ -1,10 +1,9 @@
 import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import SkeletonCard from '../components/SkeletonCard';
 import EmptyState from '../components/EmptyState';
-
 import { catalogApi } from '../services/catalogApi';
-import { useState, useEffect } from 'react';
 import type { Product, Item } from '../types/api';
 import './HomePage.css'; // Reuse home page layout styles
 
@@ -19,29 +18,28 @@ export default function ProductListingPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
 
     const fetchProducts = async () => {
+      // setLoading called inside the async function, not synchronously in the effect body
+      setLoading(true);
       try {
         const [results, allItems] = await Promise.all([
           queryStr ? catalogApi.searchProducts(queryStr) : catalogApi.getProducts(),
           catalogApi.getItems()
         ]);
-        
+
         if (!cancelled) {
           setItems(allItems);
           if (queryStr) {
             setProducts(results);
+          } else if (categoryStr) {
+            setProducts(results.filter(p => p.categoryName.toLowerCase() === categoryStr.toLowerCase()));
           } else {
-            if (categoryStr) {
-              setProducts(results.filter(p => p.categoryName.toLowerCase() === categoryStr.toLowerCase()));
-            } else {
-              setProducts(results);
-            }
+            setProducts(results);
           }
         }
       } catch (err) {
-        console.error(err);
+        if (!cancelled) console.error('Failed to fetch products:', err);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -51,7 +49,11 @@ export default function ProductListingPage() {
     return () => { cancelled = true; };
   }, [categoryStr, queryStr]);
 
-  const title = queryStr ? `Search: ${queryStr}` : (categoryStr ? categoryStr.charAt(0).toUpperCase() + categoryStr.slice(1) : 'All Products');
+  const title = queryStr
+    ? `Search: ${queryStr}`
+    : categoryStr
+      ? categoryStr.charAt(0).toUpperCase() + categoryStr.slice(1)
+      : 'All Products';
 
   return (
     <div className="home-page">
@@ -85,4 +87,3 @@ export default function ProductListingPage() {
     </div>
   );
 }
-

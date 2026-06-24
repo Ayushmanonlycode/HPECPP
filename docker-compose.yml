@@ -9,10 +9,41 @@ networks:
 volumes:
   prometheus-data:
   grafana-data:
+  otel-agent-vol:
 
 services:
 
   # ── Observability ──────────────────────────────────────────────
+
+  # Initialises the shared OTel agent volume by copying the JAR into it.
+  otel-agent-init:
+    build:
+      context: ./observability/otel-agent
+      dockerfile: Dockerfile
+    image: otel-agent-image
+    container_name: otel-agent-init
+    profiles: [observability, spring, wildfly]
+    volumes:
+      - otel-agent-vol:/otel-agent
+    # Uses alpine so that the sh entrypoint is available (scratch has no shell)
+    entrypoint: ["/bin/sh", "-c", "cp /opentelemetry-javaagent.jar /otel-agent/opentelemetry-javaagent.jar && echo 'OTel agent ready'"]
+    restart: "no"
+    networks: [showdown-net]
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.101.0
+    container_name: otel-collector
+    profiles: [observability, spring, wildfly]
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./observability/otel-collector/otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8889:8889"   # Prometheus metrics exporter (scraped by Prometheus)
+    depends_on: [jaeger]
+    networks: [showdown-net]
+
   jaeger:
     image: jaegertracing/all-in-one:1.57
     container_name: jaeger
@@ -21,8 +52,7 @@ services:
       COLLECTOR_OTLP_ENABLED: "true"
     ports:
       - "16686:16686"
-      - "4317:4317"
-      - "4318:4318"
+      - "14250:14250"  # gRPC from otel-collector
     networks: [showdown-net]
 
   prometheus:
@@ -41,13 +71,43 @@ services:
     container_name: grafana
     profiles: [observability, spring, wildfly]
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - grafana-data:/var/lib/grafana
       - ./observability/grafana/provisioning:/etc/grafana/provisioning
     ports:
       - "3000:3000"
+    networks: [showdown-net]
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    profiles: [observability, spring, wildfly]
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "8090:8080"
+    networks: [showdown-net]
+
+  # ── Keycloak Identity Provider ────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.4
+    container_name: keycloak
+    profiles: [spring, wildfly]
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    ports:
+      - "8180:8080"
     networks: [showdown-net]
 
   # ── Spring Boot Databases ──────────────────────────────────────
@@ -57,8 +117,8 @@ services:
     profiles: [spring]
     environment:
       POSTGRES_DB: userdb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5431:5432"
     networks: [showdown-net]
@@ -69,8 +129,8 @@ services:
     profiles: [spring]
     environment:
       POSTGRES_DB: catalogdb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5436:5432"
     networks: [showdown-net]
@@ -81,8 +141,8 @@ services:
     profiles: [spring]
     environment:
       POSTGRES_DB: inventorydb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5433:5432"
     networks: [showdown-net]
@@ -93,8 +153,8 @@ services:
     profiles: [spring]
     environment:
       POSTGRES_DB: ordercapturedb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5434:5432"
     networks: [showdown-net]
@@ -105,8 +165,8 @@ services:
     profiles: [spring]
     environment:
       POSTGRES_DB: orderfulfilmentdb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5435:5432"
     networks: [showdown-net]
@@ -119,22 +179,22 @@ services:
       - "6381:6379"
     networks: [showdown-net]
 
-  # ── Spring Boot Services ───────────────────────────────────────
+  # ── Spring Boot API Gateway (NGINX reverse proxy) ─────────────
   sb-api-gateway:
-    build:
-      context: ./spring-boot
-      dockerfile: ./api-gateway/Dockerfile
+    image: nginx:alpine
     container_name: sb-api-gateway
     profiles: [spring]
-    environment:
-      GATEWAY_USER_SERVICE: http://sb-user-service:8081
-      GATEWAY_CATALOG_SERVICE: http://sb-catalog-service:8082
-      GATEWAY_INVENTORY_SERVICE: http://sb-inventory-service:8083
-      GATEWAY_ORDER_CAPTURE_SERVICE: http://sb-order-capture-service:8084
-      GATEWAY_ORDER_FULFILMENT_SERVICE: http://sb-order-fulfilment-service:8085
-      GATEWAY_CART_SERVICE: http://sb-cart-service:8086
+    volumes:
+      - ./spring-boot/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "8080:8080"
+    depends_on:
+      - sb-user-service
+      - sb-catalog-service
+      - sb-inventory-service
+      - sb-order-capture-service
+      - sb-order-fulfilment-service
+      - sb-cart-service
     networks: [showdown-net]
 
   sb-user-service:
@@ -145,11 +205,19 @@ services:
     profiles: [spring]
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-user-db:5432/userdb
-      SPRING_DATASOURCE_USERNAME: showdown
-      SPRING_DATASOURCE_PASSWORD: showdown123
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: sb-user-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8081:8081"
-    depends_on: [sb-user-db]
+    depends_on: [sb-user-db, otel-agent-init, otel-collector]
     networks: [showdown-net]
 
   sb-catalog-service:
@@ -160,11 +228,22 @@ services:
     profiles: [spring]
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-catalog-db:5432/catalogdb
-      SPRING_DATASOURCE_USERNAME: showdown
-      SPRING_DATASOURCE_PASSWORD: showdown123
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      SERVICES_INVENTORY_URL: http://sb-inventory-service:8083
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: sb-catalog-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8082:8082"
-    depends_on: [sb-catalog-db]
+    depends_on: [sb-catalog-db, otel-agent-init, otel-collector]
     networks: [showdown-net]
 
   sb-inventory-service:
@@ -175,11 +254,20 @@ services:
     profiles: [spring]
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-inventory-db:5432/inventorydb
-      SPRING_DATASOURCE_USERNAME: showdown
-      SPRING_DATASOURCE_PASSWORD: showdown123
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_URL: http://keycloak:8080
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: sb-inventory-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8083:8083"
-    depends_on: [sb-inventory-db]
+    depends_on: [sb-inventory-db, otel-agent-init, otel-collector]
     networks: [showdown-net]
 
   sb-order-capture-service:
@@ -190,11 +278,24 @@ services:
     profiles: [spring]
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-order-capture-db:5432/ordercapturedb
-      SPRING_DATASOURCE_USERNAME: showdown
-      SPRING_DATASOURCE_PASSWORD: showdown123
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      SERVICES_INVENTORY_URL: http://sb-inventory-service:8083
+      SERVICES_FULFILMENT_URL: http://sb-order-fulfilment-service:8085
+      SERVICES_USER_URL: http://sb-user-service:8081
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: sb-order-capture-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8084:8084"
-    depends_on: [sb-order-capture-db]
+    depends_on: [sb-order-capture-db, otel-agent-init, otel-collector]
     networks: [showdown-net]
 
   sb-order-fulfilment-service:
@@ -205,11 +306,20 @@ services:
     profiles: [spring]
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-order-fulfilment-db:5432/orderfulfilmentdb
-      SPRING_DATASOURCE_USERNAME: showdown
-      SPRING_DATASOURCE_PASSWORD: showdown123
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_URL: http://keycloak:8080
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: sb-order-fulfilment-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8085:8085"
-    depends_on: [sb-order-fulfilment-db]
+    depends_on: [sb-order-fulfilment-db, otel-agent-init, otel-collector]
     networks: [showdown-net]
 
   sb-cart-service:
@@ -220,9 +330,18 @@ services:
     profiles: [spring]
     environment:
       SPRING_DATA_REDIS_HOST: sb-cart-db
+      KEYCLOAK_URL: http://keycloak:8080
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar"
+      OTEL_SERVICE_NAME: sb-cart-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8086:8086"
-    depends_on: [sb-cart-db]
+    depends_on: [sb-cart-db, otel-agent-init, otel-collector]
     networks: [showdown-net]
 
   # ── WildFly Databases ─────────────────────────────────────────
@@ -232,8 +351,8 @@ services:
     profiles: [wildfly]
     environment:
       POSTGRES_DB: userdb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5441:5432"
     networks: [showdown-net]
@@ -244,8 +363,8 @@ services:
     profiles: [wildfly]
     environment:
       POSTGRES_DB: catalogdb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5442:5432"
     networks: [showdown-net]
@@ -256,8 +375,8 @@ services:
     profiles: [wildfly]
     environment:
       POSTGRES_DB: inventorydb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5443:5432"
     networks: [showdown-net]
@@ -268,8 +387,8 @@ services:
     profiles: [wildfly]
     environment:
       POSTGRES_DB: ordercapturedb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5444:5432"
     networks: [showdown-net]
@@ -280,8 +399,8 @@ services:
     profiles: [wildfly]
     environment:
       POSTGRES_DB: orderfulfilmentdb
-      POSTGRES_USER: showdown
-      POSTGRES_PASSWORD: showdown123
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5445:5432"
     networks: [showdown-net]
@@ -320,8 +439,8 @@ services:
     profiles: [wildfly]
     environment:
       DB_URL: jdbc:postgresql://wf-user-db:5432/userdb
-      DB_USER: showdown
-      DB_PASSWORD: showdown123
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "9081:8080"
     depends_on: [wf-user-db]
@@ -335,8 +454,8 @@ services:
     profiles: [wildfly]
     environment:
       DB_URL: jdbc:postgresql://wf-catalog-db:5432/catalogdb
-      DB_USER: showdown
-      DB_PASSWORD: showdown123
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "9082:8080"
     depends_on: [wf-catalog-db]
@@ -350,8 +469,8 @@ services:
     profiles: [wildfly]
     environment:
       DB_URL: jdbc:postgresql://wf-inventory-db:5432/inventorydb
-      DB_USER: showdown
-      DB_PASSWORD: showdown123
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "9083:8080"
     depends_on: [wf-inventory-db]
@@ -365,8 +484,8 @@ services:
     profiles: [wildfly]
     environment:
       DB_URL: jdbc:postgresql://wf-order-capture-db:5432/ordercapturedb
-      DB_USER: showdown
-      DB_PASSWORD: showdown123
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "9084:8080"
     depends_on: [wf-order-capture-db]
@@ -380,8 +499,8 @@ services:
     profiles: [wildfly]
     environment:
       DB_URL: jdbc:postgresql://wf-order-fulfilment-db:5432/orderfulfilmentdb
-      DB_USER: showdown
-      DB_PASSWORD: showdown123
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "9085:8080"
     depends_on: [wf-order-fulfilment-db]

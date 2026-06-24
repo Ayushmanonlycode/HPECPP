@@ -8,6 +8,7 @@ import com.showdown.springboot.catalogservice.entity.Item;
 import com.showdown.springboot.catalogservice.entity.Product;
 import com.showdown.springboot.catalogservice.exception.ResourceNotFoundException;
 import com.showdown.springboot.catalogservice.repository.CategoryRepository;
+import com.showdown.springboot.catalogservice.client.InventoryClient;
 import com.showdown.springboot.catalogservice.repository.ItemRepository;
 import com.showdown.springboot.catalogservice.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,11 +40,14 @@ public class CatalogServiceImplTest {
     @Mock
     private ItemRepository itemRepository;
 
+    @Mock
+    private InventoryClient inventoryClient;
+
     private CatalogServiceImpl catalogService;
 
     @BeforeEach
     void setUp() {
-        catalogService = new CatalogServiceImpl(categoryRepository, productRepository, itemRepository);
+        catalogService = new CatalogServiceImpl(categoryRepository, productRepository, itemRepository, inventoryClient);
     }
 
     // ── Category Tests ───────────────────────────────────────────

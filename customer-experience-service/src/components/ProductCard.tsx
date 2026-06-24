@@ -25,7 +25,7 @@ export default function ProductCard({ product, item }: Props) {
         unitPrice: item.listPrice,
       });
       showToast(`${item.description ?? product.name} added to cart!`);
-    } catch (err) {
+    } catch {
       showToast(`Failed to add ${item.description ?? product.name} to cart`, 'error');
     }
   };
@@ -40,10 +40,17 @@ export default function ProductCard({ product, item }: Props) {
             <PawIcon />
           </div>
         )}
-        <span className="product-card__badge">
-          <span className="product-card__badge-dot" />
-          In Stock
-        </span>
+        {item && item.availableQuantity !== undefined ? (
+          <span className={`product-card__badge ${item.availableQuantity <= 0 ? 'out-of-stock' : ''}`}>
+            <span className="product-card__badge-dot" />
+            {item.availableQuantity > 0 ? 'In Stock' : 'Out of Stock'}
+          </span>
+        ) : (
+          <span className="product-card__badge">
+            <span className="product-card__badge-dot" />
+            In Stock
+          </span>
+        )}
       </div>
 
       <div className="product-card__body">
@@ -57,6 +64,7 @@ export default function ProductCard({ product, item }: Props) {
             <button
               className="product-card__cart-btn"
               onClick={handleAddToCart}
+              disabled={item.availableQuantity !== undefined && item.availableQuantity <= 0}
               aria-label={`Add ${product.name} to cart`}
             >
               <CartIcon />

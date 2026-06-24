@@ -25,7 +25,7 @@ function getOrCreateGuestId(): string {
 function restoreUser(): UserProfile | null {
   try {
     const stored = localStorage.getItem('user');
-    if (stored) return JSON.parse(stored);
+    if (stored) return JSON.parse(stored) as UserProfile;
   } catch { /* ignore */ }
   return null;
 }
@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthState {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');

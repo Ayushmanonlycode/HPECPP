@@ -8,6 +8,9 @@ import com.showdown.springboot.ordercaptureservice.entity.OrderLineItem;
 import com.showdown.springboot.ordercaptureservice.entity.OrderStatus;
 import com.showdown.springboot.ordercaptureservice.exception.InvalidOrderException;
 import com.showdown.springboot.ordercaptureservice.exception.ResourceNotFoundException;
+import com.showdown.springboot.ordercaptureservice.client.InventoryClient;
+import com.showdown.springboot.ordercaptureservice.client.OrderFulfilmentClient;
+import com.showdown.springboot.ordercaptureservice.client.UserClient;
 import com.showdown.springboot.ordercaptureservice.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,21 +25,41 @@ import java.util.stream.Collectors;
 public class OrderCaptureServiceImpl implements OrderCaptureService {
 
     private final OrderRepository orderRepository;
+    private final InventoryClient inventoryClient;
+    private final OrderFulfilmentClient orderFulfilmentClient;
+    private final UserClient userClient;
 
-    public OrderCaptureServiceImpl(OrderRepository orderRepository) {
+    public OrderCaptureServiceImpl(OrderRepository orderRepository,
+                                   InventoryClient inventoryClient,
+                                   OrderFulfilmentClient orderFulfilmentClient,
+                                   UserClient userClient) {
         this.orderRepository = orderRepository;
+        this.inventoryClient = inventoryClient;
+        this.orderFulfilmentClient = orderFulfilmentClient;
+        this.userClient = userClient;
     }
 
     @Override
     public OrderDto createOrder(CreateOrderDto dto) {
         Order order = new Order();
         order.setUserId(dto.getUserId());
+        order.setCustomerName(dto.getCustomerName());
         order.setShippingAddress(dto.getShippingAddress());
         order.setStatus(OrderStatus.CREATED);
 
-        BigDecimal total = BigDecimal.ZERO;
+        // Validate user exists
+        if (!userClient.checkUserExists(dto.getUserId())) {
+            throw new InvalidOrderException("Invalid user ID: " + dto.getUserId());
+        }
+
+        BigDecimal subtotal = BigDecimal.ZERO;
 
         for (OrderLineItemDto itemDto : dto.getLineItems()) {
+            boolean reserved = inventoryClient.reserveStock(itemDto.getItemSku(), itemDto.getQuantity());
+            if (!reserved) {
+                throw new InvalidOrderException("Insufficient stock or inventory service unavailable for SKU: " + itemDto.getItemSku());
+            }
+
             OrderLineItem lineItem = new OrderLineItem();
             lineItem.setItemSku(itemDto.getItemSku());
             lineItem.setProductName(itemDto.getProductName());
@@ -44,17 +67,25 @@ public class OrderCaptureServiceImpl implements OrderCaptureService {
             lineItem.setUnitPrice(itemDto.getUnitPrice());
             lineItem.calculateLineTotal();
             order.addLineItem(lineItem);
-            total = total.add(lineItem.getLineTotal());
+            subtotal = subtotal.add(lineItem.getLineTotal());
         }
+
+        BigDecimal shipping = new BigDecimal("15.00");
+        BigDecimal tax = subtotal.multiply(new BigDecimal("0.085"));
+        BigDecimal total = subtotal.add(shipping).add(tax);
 
         order.setTotalAmount(total);
         Order saved = orderRepository.save(order);
+
+        // Kick off the fulfilment process
+        orderFulfilmentClient.createFulfilment(saved.getId());
+
         return toDto(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public OrderDto getOrder(UUID id) {
+    public OrderDto getOrder(String id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
         return toDto(order);
@@ -62,14 +93,14 @@ public class OrderCaptureServiceImpl implements OrderCaptureService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDto> getOrdersByUser(UUID userId) {
+    public List<OrderDto> getOrdersByUser(String userId) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public OrderDto confirmOrder(UUID id) {
+    public OrderDto confirmOrder(String id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
 
@@ -84,7 +115,7 @@ public class OrderCaptureServiceImpl implements OrderCaptureService {
     }
 
     @Override
-    public OrderDto cancelOrder(UUID id) {
+    public OrderDto cancelOrder(String id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", id));
 
@@ -111,6 +142,7 @@ public class OrderCaptureServiceImpl implements OrderCaptureService {
         OrderDto dto = new OrderDto();
         dto.setId(order.getId());
         dto.setUserId(order.getUserId());
+        dto.setCustomerName(order.getCustomerName());
         dto.setStatus(order.getStatus().name());
         dto.setTotalAmount(order.getTotalAmount());
         dto.setShippingAddress(order.getShippingAddress());

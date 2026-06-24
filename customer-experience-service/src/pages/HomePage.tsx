@@ -1,18 +1,9 @@
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import SkeletonCard from '../components/SkeletonCard';
-import Button from '../components/Button';
 import { useProducts } from '../hooks/useProducts';
 import heroDogImg from '../assets/hero-dog.png';
 import './HomePage.css';
-
-const CATEGORIES = [
-  { name: 'Fish', path: '/products?category=fish' },
-  { name: 'Dogs', path: '/products?category=dogs' },
-  { name: 'Reptiles', path: '/products?category=reptiles' },
-  { name: 'Cats', path: '/products?category=cats' },
-  { name: 'Birds', path: '/products?category=birds' },
-];
 
 export default function HomePage() {
   const { products, items, loading } = useProducts();
@@ -20,39 +11,37 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
+
       {/* ── Hero ──────────────────────────────────────── */}
-      <section className="home-page__hero">
-        <div className="home-page__hero-inner">
-          <div className="home-page__hero-content">
-            <span className="home-page__hero-badge">New Collection</span>
-            <h2 className="home-page__hero-title">The Next Generation of Companions</h2>
-            <p className="home-page__hero-desc">
-              Discover our curated selection of high-fidelity companions.<br />
-              Effortless sophistication meets uncompromised loyalty.
-            </p>
-            <Link to="/products" style={{ display: 'inline-block', marginTop: '24px' }}>
-              <Button variant="outline" size="md">Explore All</Button>
+      <section className="hero">
+        {/* Left content */}
+        <div className="hero__content">
+          <span className="hero__badge">New Collection</span>
+          <h1 className="hero__title">
+            The Next Generation<br />of Companions
+          </h1>
+          <p className="hero__desc">
+            Discover our curated selection of high-fidelity companions.<br />
+            Effortless sophistication meets uncompromised loyalty.
+          </p>
+
+          <div className="hero__cta-row">
+            <Link to="/products" className="hero__btn">
+              Explore All &nbsp;&rarr;
             </Link>
           </div>
-          <div className="home-page__hero-image-wrap">
-            <img src={heroDogImg} alt="Featured dog" className="home-page__hero-image" />
-          </div>
+
         </div>
+
+        {/* Right image */}
+        <div className="hero__image-wrap">
+          <img src={heroDogImg} alt="Featured companion" className="hero__image" />
+        </div>
+
+
       </section>
 
-      {/* ── Category Strip ──────────────────────────────── */}
-      <section className="home-page__categories">
-        <h3 className="home-page__categories-title">Shop by Category</h3>
-        <div className="home-page__categories-list">
-          {CATEGORIES.map((cat) => (
-            <Link key={cat.name} to={cat.path} className="home-page__category-link">
-              {cat.name}
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Main / Featured ─────────────────────────────── */}
+      {/* ── Featured Dogs ────────────────────────────── */}
       <div className="home-page__main">
         <header className="home-page__header">
           <div>

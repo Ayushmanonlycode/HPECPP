@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../context/AuthContext';
@@ -14,7 +14,8 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const orderPlaced = useRef(false); // prevents cart-empty guard from firing after order
+  // Use state (not ref) so the redirect guard reacts to changes correctly
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : '',
@@ -28,7 +29,8 @@ export default function CheckoutPage() {
     zip: user?.zip ?? '',
   });
 
-  if (!orderPlaced.current && !loading && (!cart || cart.items.length === 0)) {
+  // Redirect to cart if cart is empty and no order has been placed yet
+  if (!orderPlaced && !loading && (!cart || cart.items.length === 0)) {
     navigate('/cart');
     return null;
   }
@@ -47,6 +49,7 @@ export default function CheckoutPage() {
 
       const order = await orderApi.createOrder({
         userId,
+        customerName: formData.fullName,
         shippingAddress: fullAddress,
         lineItems: cart!.items.map(item => ({
           itemSku: item.itemSku,
@@ -70,17 +73,20 @@ export default function CheckoutPage() {
             zip: formData.zip || undefined,
             country: formData.country || undefined,
           });
-          login(updatedUser); // Update local context
+          login(updatedUser);
         } catch (profileErr) {
-          console.error("Failed to update user profile with new address", profileErr);
+          // Non-fatal: silently log — the order still succeeded
+          console.error('Failed to update user profile with new address', profileErr);
         }
       }
 
-      orderPlaced.current = true; // block redirect guard
-      await clearCart();           // clear first, now safe since guard is blocked
+      setOrderPlaced(true); // block redirect guard before clearing cart
+      await clearCart();
       navigate(`/orders/${order.id}/confirmation`);
-    } catch (err: any) {
-      setError(typeof err.message === 'string' ? err.message : 'Failed to place order');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message
+        : (err as { message?: string })?.message ?? 'Failed to place order';
+      setError(message);
       setLoading(false);
     }
   };
@@ -90,18 +96,17 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.085;
   const total = subtotal + shipping + tax;
 
-
   return (
     <div className="checkout-page">
       <div className="checkout-page__layout">
         <div className="checkout-page__form-container">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h1 className="checkout-page__form-title" style={{ margin: 0 }}>Shipping Information</h1>
+          <div className="checkout-page__form-header">
+            <h1 className="checkout-page__form-title">Shipping Information</h1>
             <Button variant="primary" size="sm" onClick={() => navigate(-1)}>
               &larr; Go Back
             </Button>
           </div>
-          
+
           <form id="checkout-form" className="checkout-form" onSubmit={handlePlaceOrder}>
             <div className="checkout-form__group">
               <label>Full Name</label>
@@ -156,8 +161,8 @@ export default function CheckoutPage() {
         <div className="checkout-page__review-wrapper">
           <div className="checkout-page__review">
             <h2 className="checkout-page__review-title">Order Review</h2>
-            
-            <div style={{ marginBottom: 24 }}>
+
+            <div className="checkout-page__review-items">
               {cart?.items.map(item => (
                 <div key={item.itemSku} className="checkout-page__review-item">
                   <span className="checkout-page__review-item-name">{item.quantity}x {item.productName}</span>
@@ -189,7 +194,7 @@ export default function CheckoutPage() {
             </div>
 
             {error && (
-              <div style={{ padding: 12, marginBottom: 16, background: 'var(--error-bg)', color: 'var(--error)', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem' }}>
+              <div className="checkout-page__error">
                 {error}
               </div>
             )}

@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: api-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Keycloak JWKS endpoint — override via KEYCLOAK_URL env var in Docker
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8180}/realms/jpetstore
   cloud:
     gateway:
       globalcors:
@@ -57,4 +63,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
