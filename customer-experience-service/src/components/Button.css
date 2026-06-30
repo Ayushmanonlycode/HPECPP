@@ -1,0 +1,70 @@
+/* ── Button ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  transition: all var(--transition);
+  white-space: nowrap;
+  border-radius: 0;
+}
+
+.btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.btn--primary {
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--text-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--text-primary);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+}
+
+.btn--outline:hover:not(:disabled) {
+  background: var(--text-primary);
+  color: var(--text-inverse);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+/* Sizes */
+.btn--sm { padding: 8px 20px; font-size: 0.7rem; }
+.btn--md { padding: 12px 28px; font-size: 0.75rem; }
+.btn--lg { padding: 16px 40px; font-size: 0.8rem; }
+
+/* Width */
+.btn--full { width: 100%; }
