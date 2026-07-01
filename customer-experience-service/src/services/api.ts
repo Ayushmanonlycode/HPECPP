@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
     config.headers['X-User-Id'] = userId;
   }
   const token = localStorage.getItem('token');
-  if (token && config.url?.startsWith('/api/users')) {
+  if (token) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
   return config;

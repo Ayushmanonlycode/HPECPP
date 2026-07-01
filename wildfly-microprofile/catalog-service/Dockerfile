@@ -19,7 +19,7 @@ RUN /opt/jboss/wildfly/bin/jboss-cli.sh --command=\
 
 # Register the driver and add datasource during image build
 RUN /opt/jboss/wildfly/bin/standalone.sh --admin-only & \
-    sleep 10 && \
+    until /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="ls" > /dev/null 2>&1; do sleep 5; done && \
     /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="\
       /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver),\
       data-source add --name=CatalogDS --jndi-name=java:/CatalogDSP --driver-name=postgresql --connection-url=jdbc:postgresql://wf-catalog-db:5432/catalogdb --user-name=showdown --password=showdown123 --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --validate-on-match=true,\

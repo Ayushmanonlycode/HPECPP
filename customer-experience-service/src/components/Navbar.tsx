@@ -9,7 +9,7 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { itemCount } = useCartContext();
-  const { user, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -31,6 +31,7 @@ export default function Navbar() {
           <Link to="/products" className="navbar__nav-link" onClick={closeMobileMenu}>Shop</Link>
           <Link to="/products?category=dogs" className="navbar__nav-link" onClick={closeMobileMenu}>Dogs</Link>
           <Link to="/products?category=cats" className="navbar__nav-link" onClick={closeMobileMenu}>Cats</Link>
+          <Link to="/products?category=reptiles" className="navbar__nav-link" onClick={closeMobileMenu}>Reptiles</Link>
           <Link to="/products?category=fish" className="navbar__nav-link" onClick={closeMobileMenu}>Fish</Link>
           <Link to="/products?category=birds" className="navbar__nav-link" onClick={closeMobileMenu}>Birds</Link>
         </nav>
@@ -63,9 +64,9 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <Link to="/auth" className="navbar__icon-btn" aria-label="Sign in" title="Sign in">
+            <button onClick={() => login()} className="navbar__icon-btn" aria-label="Sign in" title="Sign in" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
               <UserIcon />
-            </Link>
+            </button>
           )}
         </div>
       </div>

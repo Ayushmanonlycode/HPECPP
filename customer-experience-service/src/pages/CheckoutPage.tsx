@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../context/AuthContext';
@@ -10,7 +10,7 @@ import './CheckoutPage.css';
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
-  const { userId, user, login } = useAuth();
+  const { userId, user, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,20 +18,43 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [formData, setFormData] = useState({
-    fullName: user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : '',
-    phone: user?.phone ?? '',
-    email: user?.email ?? '',
-    address1: user?.address ?? '',
+    fullName: '',
+    phone: '',
+    email: '',
+    address1: '',
     address2: '',
-    city: user?.city ?? '',
-    state: user?.state ?? '',
-    country: user?.country ?? '',
-    zip: user?.zip ?? '',
+    city: '',
+    state: '',
+    country: '',
+    zip: '',
   });
 
+  // Sync form fields whenever the user profile is loaded/updated from the backend
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || prev.fullName,
+        phone: user.phone || prev.phone,
+        email: user.email || prev.email,
+        address1: user.address || prev.address1,
+        address2: user.address2 || prev.address2,
+        city: user.city || prev.city,
+        state: user.state || prev.state,
+        country: user.country || prev.country,
+        zip: user.zip || prev.zip,
+      }));
+    }
+  }, [user]);
+
   // Redirect to cart if cart is empty and no order has been placed yet
+  useEffect(() => {
+    if (!orderPlaced && !loading && (!cart || cart.items.length === 0)) {
+      navigate('/cart');
+    }
+  }, [orderPlaced, loading, cart, navigate]);
+
   if (!orderPlaced && !loading && (!cart || cart.items.length === 0)) {
-    navigate('/cart');
     return null;
   }
 
@@ -59,21 +82,23 @@ export default function CheckoutPage() {
         })),
       });
 
-      // Save shipping address if user has none saved
-      if (user && !user.address) {
+      // Always save/update the profile with the latest shipping details
+      if (user) {
         try {
-          const [firstName, ...rest] = formData.fullName.split(' ');
-          const updatedUser = await authApi.updateProfile(userId, {
-            firstName: firstName || undefined,
-            lastName: rest.join(' ') || undefined,
+          const nameParts = formData.fullName.split(' ');
+          await authApi.updateProfile(userId, {
+            firstName: nameParts[0] || undefined,
+            lastName: nameParts.slice(1).join(' ') || undefined,
             phone: formData.phone || undefined,
             address: formData.address1 || undefined,
+            address2: formData.address2 || undefined,
             city: formData.city || undefined,
             state: formData.state || undefined,
             zip: formData.zip || undefined,
             country: formData.country || undefined,
           });
-          login(updatedUser);
+          // Refresh context so the next checkout visit pre-fills correctly
+          await refreshProfile();
         } catch (profileErr) {
           // Non-fatal: silently log — the order still succeeded
           console.error('Failed to update user profile with new address', profileErr);

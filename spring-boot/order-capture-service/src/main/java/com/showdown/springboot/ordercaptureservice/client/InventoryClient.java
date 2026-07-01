@@ -112,4 +112,56 @@ public class InventoryClient {
         // Optimistic fallback: allow the order through; inventory check will happen at fulfilment
         return true;
     }
+
+    /**
+     * Releases a reservation for a given item SKU.
+     */
+    @CircuitBreaker(name = CB_NAME, fallbackMethod = "releaseReservationFallback")
+    @Retry(name = CB_NAME)
+    public boolean releaseReservation(String sku, int quantity) {
+        try {
+            Map<?, ?> response = webClient.post()
+                    .uri("/api/inventory/{sku}/release", sku)
+                    .bodyValue(Map.of("quantity", quantity))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            return response != null;
+        } catch (WebClientResponseException e) {
+            log.error("Error releasing reservation for SKU: {}", sku, e);
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public boolean releaseReservationFallback(String sku, int quantity, Throwable t) {
+        log.error("Inventory service unavailable for releasing reservation SKU {} — circuit open. Reason: {}", sku, t.getMessage());
+        return false;
+    }
+
+    /**
+     * Adjusts physical stock (permanently) for a given item SKU.
+     */
+    @CircuitBreaker(name = CB_NAME, fallbackMethod = "adjustStockFallback")
+    @Retry(name = CB_NAME)
+    public boolean adjustStock(String sku, int quantity) {
+        try {
+            Map<?, ?> response = webClient.put()
+                    .uri("/api/inventory/{sku}/adjust", sku)
+                    .bodyValue(Map.of("quantity", quantity))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            return response != null;
+        } catch (WebClientResponseException e) {
+            log.error("Error adjusting stock for SKU: {}", sku, e);
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public boolean adjustStockFallback(String sku, int quantity, Throwable t) {
+        log.error("Inventory service unavailable for adjusting stock SKU {} — circuit open. Reason: {}", sku, t.getMessage());
+        return false;
+    }
 }

@@ -9,7 +9,6 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -25,6 +24,7 @@ public class User {
     private String lastName;
     private String phone;
     private String address;
+    private String address2;
     private String city;
     private String state;
     private String zip;
@@ -116,6 +116,14 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getAddress2() {
+        return address2;
+    }
+
+    public void setAddress2(String address2) {
+        this.address2 = address2;
     }
 
     public String getCity() {
