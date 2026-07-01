@@ -21,6 +21,10 @@ RUN /opt/jboss/wildfly/bin/jboss-cli.sh --command=\
 RUN /opt/jboss/wildfly/bin/standalone.sh --admin-only & \
     sleep 10 && \
     /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="\
+      /extension=org.wildfly.extension.opentelemetry:add(),\
+      /subsystem=opentelemetry:add(),\
+      /subsystem=opentelemetry:write-attribute(name=service-name,value=catalog-service),\
+      /subsystem=opentelemetry:write-attribute(name=endpoint,value=http://otel-collector:4317),\
       /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver),\
       data-source add --name=CatalogDS --jndi-name=java:/CatalogDSP --driver-name=postgresql --connection-url=jdbc:postgresql://wf-catalog-db:5432/catalogdb --user-name=showdown --password=showdown123 --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --validate-on-match=true,\
       shutdown" && \

@@ -50,6 +50,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.eclipse.microprofile.rest.client</groupId>
+            <artifactId>microprofile-rest-client-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- MySQL JDBC Driver -->
         <dependency>
             <groupId>com.mysql</groupId>

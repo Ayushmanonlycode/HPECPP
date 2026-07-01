@@ -1,13 +1,7 @@
-package Models;
+package Models.Dto;
 
+public class InventoryDto {
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
-@Entity
-public class Inventory {
-
-    @Id
     private String id;
     private String itemSku;
     private String itemId;
@@ -19,6 +13,14 @@ public class Inventory {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getItemSku() {
+        return itemSku;
+    }
+
+    public void setItemSku(String itemSku) {
+        this.itemSku = itemSku;
     }
 
     public String getItemId() {
@@ -35,13 +37,5 @@ public class Inventory {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public String getItemSku() {
-        return itemSku;
-    }
-
-    public void setItemSku(String itemSku) {
-        this.itemSku = itemSku;
     }
 }

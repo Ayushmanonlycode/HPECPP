@@ -23,11 +23,11 @@ public class InventoryService {
         return inventoryRepo.addInventory(inventory);
     }
 
-    public List<Inventory> getInventoryByItemId(String itemId) {
-        return inventoryRepo.getInventoryByItemId(itemId);
+    public Inventory getInventoryByItemSku(String sku) {
+        return inventoryRepo.getInventoryByItemSku(sku);
     }
 
-    public int updateInventory(String itemId, int quantity) {
-        return inventoryRepo.updateInventory(itemId, quantity);
+    public int updateInventory(String sku, int quantity) {
+        return inventoryRepo.updateInventory(sku, quantity);
     }
 }

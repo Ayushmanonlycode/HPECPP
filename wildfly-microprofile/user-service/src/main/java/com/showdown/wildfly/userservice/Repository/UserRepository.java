@@ -58,4 +58,9 @@ public class UserRepository {
             return null;
         }
     }
+
+
+    public boolean checkUser(String id){
+        return em.find(User.class, id) != null;
+    }
 }

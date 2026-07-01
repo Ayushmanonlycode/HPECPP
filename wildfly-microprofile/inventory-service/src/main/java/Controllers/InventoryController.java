@@ -25,17 +25,17 @@ public class InventoryController {
     }
 
     @GET
-    @Path("/item")
+    @Path("/{sku}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Inventory> getInventoryByItemId(@QueryParam("itemId") String itemId) {
-        return inventoryService.getInventoryByItemId(itemId);
+    public Inventory getInventoryByItemSku(@PathParam("sku") String sku) {
+        return inventoryService.getInventoryByItemSku(sku);
     }
 
 
     @PUT
-    @Path("/update")
-    public Response updateInventory(@QueryParam("itemId") String itemId, @QueryParam("quantity") int quantity) {
-        int res= inventoryService.updateInventory(itemId, quantity);
+    @Path("/update/{sku}")
+    public Response updateInventory(@PathParam("sku") String sku, @QueryParam("quantity") int quantity) {
+        int res= inventoryService.updateInventory(sku, quantity);
         if(res==0) {
             return Response.ok("Inventory updated successfully").build();
         }

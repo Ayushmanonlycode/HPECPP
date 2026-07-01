@@ -60,4 +60,8 @@ public class UserService {
     public User login(String username, String password) {
         return userRepository.login(username, password);
     }
+
+    public boolean checkUser(String id){
+       return userRepository.checkUser(id);
+    }
 }

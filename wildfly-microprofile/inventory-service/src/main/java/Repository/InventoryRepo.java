@@ -41,18 +41,18 @@ public class InventoryRepo {
 
     }
 
-    public List<Inventory> getInventoryByItemId(String itemId) {
-        return em.createQuery("SELECT i FROM Inventory i WHERE i.itemId= :itemId", Inventory.class)
-                .setParameter("itemId", itemId)
-                .getResultList();
+    public Inventory getInventoryByItemSku(String sku) {
+        return em.createQuery("SELECT i FROM Inventory i WHERE i.itemSku= :sku", Inventory.class)
+                .setParameter("sku", sku)
+                .getSingleResult();
     }
 
     @Transactional
-    public int updateInventory(String itemId, int quantity) {
+    public int updateInventory(String sku, int quantity) {
         List<Inventory> result = em.createQuery(
-                        "SELECT i FROM Inventory i WHERE i.itemId = :itemId",
+                        "SELECT i FROM Inventory i WHERE i.itemSku = :sku",
                         Inventory.class)
-                .setParameter("itemId", itemId)
+                .setParameter("sku", sku)
                 .getResultList();
 
         if (result.isEmpty()) {
