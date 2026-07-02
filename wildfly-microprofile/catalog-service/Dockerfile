@@ -25,6 +25,9 @@ RUN /opt/jboss/wildfly/bin/standalone.sh --admin-only & \
       /subsystem=opentelemetry:add(),\
       /subsystem=opentelemetry:write-attribute(name=service-name,value=catalog-service),\
       /subsystem=opentelemetry:write-attribute(name=endpoint,value=http://otel-collector:4317),\
+      /extension=org.wildfly.extension.microprofile.health-smallrye:add(),\
+      /subsystem=microprofile-health-smallrye:add(),\
+      /subsystem=microprofile-health-smallrye:write-attribute(name=security-enabled,value=false),\
       /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver),\
       data-source add --name=CatalogDS --jndi-name=java:/CatalogDSP --driver-name=postgresql --connection-url=jdbc:postgresql://wf-catalog-db:5432/catalogdb --user-name=showdown --password=showdown123 --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --validate-on-match=true,\
       shutdown" && \
