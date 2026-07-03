@@ -25,7 +25,7 @@ services:
     image: redis:7-alpine
     container_name: redis-sentinel
     ports:
-      - "26379:26379"
+      - "26382:26379"
     command: >
       sh -c "echo 'sentinel monitor mymaster 172.28.28.2 6379 1' > /etc/redis-sentinel.conf &&
              echo 'sentinel down-after-milliseconds mymaster 5000' >> /etc/redis-sentinel.conf &&
