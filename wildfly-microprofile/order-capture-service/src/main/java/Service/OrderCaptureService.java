@@ -1,5 +1,7 @@
 package Service;
 
+import CDI.InventoryCDI;
+import CDI.UserCDI;
 import Client.InventoryClient;
 import Client.UserClient;
 import Models.Dto.InventoryDto;
@@ -13,6 +15,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Retry;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.math.BigDecimal;
@@ -25,20 +31,29 @@ public class OrderCaptureService {
     @Inject
     OrderCaptureRepo orderRepo;
 
-    @Inject
-    @RestClient
-    InventoryClient inventoryClient;
+
 
     @Inject
-    @RestClient
-    UserClient userClient;
+    InventoryCDI inventoryCDI;
 
+    @Inject
+    UserCDI userCDI;
+
+
+    @Retry(maxRetries = 3)
+    @Timeout(3000)
+    @CircuitBreaker(
+            requestVolumeThreshold = 4,
+            failureRatio = 0.5,
+            delay = 5000
+    )
+    @Fallback(fallbackMethod = "createOrderFallback")
     public Orders placeOrder(OrderDto orderDto) {
 
         Orders order = new Orders();
 
         Response response =
-                userClient.checkUser(
+                userCDI.checkUser(
                         orderDto.getUserId()
                 );
 
@@ -59,7 +74,7 @@ public class OrderCaptureService {
 
         for(LineItemDto itemDto : orderDto.getLineItems()) {
 
-            InventoryDto inv= inventoryClient.getInventoryBySku(itemDto.getItemSku());
+            InventoryDto inv= inventoryCDI.getInventory(itemDto.getItemSku());
 
             BigDecimal price = itemDto.getUnitPrice();
             int quantity = itemDto.getQuantity();
@@ -85,7 +100,7 @@ public class OrderCaptureService {
 
             int newQuantity = inv.getQuantity() - quantity;
 
-            inventoryClient.updateInventory(
+            inventoryCDI.updateInventory(
                     itemDto.getItemSku(),
                     newQuantity
             );
@@ -94,6 +109,10 @@ public class OrderCaptureService {
         order.setTotalAmount(totalAmount);
 
         return orderRepo.placeOrder(order);
+    }
+
+    public Orders createOrderFallback(OrderDto orderDto) {
+        throw new RuntimeException("Order service temporarily unavailable.");
     }
 
     @Transactional
