@@ -2,6 +2,7 @@ package com.showdown.wildfly.userservice.Controllers;
 
 import com.showdown.wildfly.userservice.Models.User;
 import com.showdown.wildfly.userservice.Service.UserService;
+import com.showdown.wildfly.userservice.Models.DTO.AuthResponseDto;
 import com.showdown.wildfly.userservice.Models.DTO.LoginDto;
 
 import jakarta.inject.Inject;
@@ -69,7 +70,7 @@ public class UserController {
     @POST
     @Path("/login")
     @PermitAll
-    public User login(LoginDto loginDto) {
+    public AuthResponseDto login(LoginDto loginDto) {
 
         return userService.login(
                 loginDto.getUsername(),

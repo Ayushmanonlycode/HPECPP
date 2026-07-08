@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
+import jakarta.json.bind.annotation.JsonbTransient;
 import java.time.Instant;
 @Entity
 @Table(name = "Users")
@@ -50,6 +51,7 @@ public class User {
         this.email = email;
     }
 
+    @JsonbTransient
     public String getPassword() {
         return password;
     }

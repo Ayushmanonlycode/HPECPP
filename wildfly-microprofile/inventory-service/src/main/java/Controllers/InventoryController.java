@@ -11,7 +11,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Path("/inventory")
-@RolesAllowed({"ADMIN", "CUSTOMER"})
+@RolesAllowed({"ADMIN","CUSTOMER"})
 public class InventoryController {
 
     @Inject

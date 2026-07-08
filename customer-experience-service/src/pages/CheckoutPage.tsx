@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../context/AuthContext';
@@ -9,7 +9,7 @@ import Spinner from '../components/Spinner';
 import './CheckoutPage.css';
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCart();
+  const { cart, loading: cartLoading, clearCart } = useCart();
   const { userId, user, login } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -29,9 +29,20 @@ export default function CheckoutPage() {
     zip: user?.zip ?? '',
   });
 
-  // Redirect to cart if cart is empty and no order has been placed yet
-  if (!orderPlaced && !loading && (!cart || cart.items.length === 0)) {
-    navigate('/cart');
+  // Redirect to cart if it's genuinely empty (not just "hasn't loaded yet")
+  // and no order has been placed. Navigation is a side effect, so it must
+  // run after render commits — calling navigate() during render mutates
+  // the router while CheckoutPage itself is still rendering, which React
+  // (correctly) rejects.
+  const cartIsEmpty = !orderPlaced && !loading && !cartLoading && cart !== null && cart.items.length === 0;
+
+  useEffect(() => {
+    if (cartIsEmpty) {
+      navigate('/cart');
+    }
+  }, [cartIsEmpty, navigate]);
+
+  if (cartIsEmpty) {
     return null;
   }
 

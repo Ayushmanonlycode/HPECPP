@@ -120,6 +120,8 @@
                         <!-- MicroProfile Config -->
                         <layer>microprofile-config</layer>
 
+                        <layer>microprofile-jwt</layer>
+
                     </layers>
 
                 </configuration>

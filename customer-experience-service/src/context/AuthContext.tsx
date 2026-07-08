@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { UserProfile } from '../types/api';
 
 interface AuthState {
@@ -46,6 +46,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('userId');
     localStorage.removeItem('token');
   };
+
+  // api.ts clears localStorage itself when it detects an expired/invalid
+  // token (before ever sending it) or gets a 401 back. Mirror that into
+  // React state here so isAuthenticated/UI reflect it immediately instead
+  // of only updating on the next full page load.
+  useEffect(() => {
+    const handleExpired = () => setUser(null);
+    window.addEventListener('auth:expired', handleExpired);
+    return () => window.removeEventListener('auth:expired', handleExpired);
+  }, []);
 
   const userId = user?.id ?? localStorage.getItem('userId') ?? getOrCreateGuestId();
 

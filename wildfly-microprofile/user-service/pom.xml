@@ -75,7 +75,25 @@
             <artifactId>jakarta.transaction-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- JSON-B (needed for jakarta.json.bind.annotation.JsonbTransient on User.getPassword()) -->
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.parsson</groupId>
+            <artifactId>parsson</artifactId>
+            <version>1.1.5</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -120,6 +138,8 @@
 
                         <!-- MicroProfile Config -->
                         <layer>microprofile-config</layer>
+
+                        <layer>microprofile-jwt</layer>
 
                     </layers>
 
