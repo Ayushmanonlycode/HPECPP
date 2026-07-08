@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   lastName: profile.family_name || '',
                   phone: '',
                   address: '',
+                  address2: '',
                   city: '',
                   state: '',
                   zip: '',

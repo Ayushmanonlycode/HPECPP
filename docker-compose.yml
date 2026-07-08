@@ -1,4 +1,3 @@
-version: "3.9"
 
 # Profiles:  spring | wildfly | observability
 
@@ -209,7 +208,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://sb-user-db:5432/userdb
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      JAVA_TOOL_OPTIONS: "-Xmx256m"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-user-service
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_METRICS_EXPORTER: otlp
@@ -312,7 +311,14 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       KEYCLOAK_URL: http://keycloak:8080
-      JAVA_TOOL_OPTIONS: "-Xmx256m"
+      JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
+      OTEL_SERVICE_NAME: sb-order-fulfilment-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_TRACES_EXPORTER: otlp
+    volumes:
+      - otel-agent-vol:/otel-agent:ro
     ports:
       - "8085:8085"
 
