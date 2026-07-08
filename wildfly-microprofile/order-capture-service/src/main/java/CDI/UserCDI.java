@@ -27,7 +27,7 @@ public class UserCDI {
         return userClient.checkUser(id);
     }
 
-    public Response userFallback(int id) {
+    public Response userFallback(String id) {
         return Response.status(503).build();
     }
 
