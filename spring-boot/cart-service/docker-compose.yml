@@ -1,0 +1,65 @@
+services:
+  redis-master:
+    image: redis:7-alpine
+    container_name: redis-master
+    ports:
+      - "6379:6379"
+    command: redis-server
+    networks:
+      sentinel-net:
+        ipv4_address: 172.28.28.2
+
+  redis-replica:
+    image: redis:7-alpine
+    container_name: redis-replica
+    ports:
+      - "6380:6379"
+    command: redis-server --replicaof 172.28.28.2 6379
+    depends_on:
+      - redis-master
+    networks:
+      sentinel-net:
+        ipv4_address: 172.28.28.3
+
+  redis-sentinel:
+    image: redis:7-alpine
+    container_name: redis-sentinel
+    ports:
+      - "26382:26379"
+    command: >
+      sh -c "echo 'sentinel monitor mymaster 172.28.28.2 6379 1' > /etc/redis-sentinel.conf &&
+             echo 'sentinel down-after-milliseconds mymaster 5000' >> /etc/redis-sentinel.conf &&
+             echo 'sentinel failover-timeout mymaster 10000' >> /etc/redis-sentinel.conf &&
+             redis-server /etc/redis-sentinel.conf --sentinel"
+    depends_on:
+      - redis-master
+      - redis-replica
+    networks:
+      sentinel-net:
+        ipv4_address: 172.28.28.4
+
+  cart-service:
+    build:
+      context: ..
+      dockerfile: cart-service/Dockerfile
+    container_name: cart-service
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATA_REDIS_SENTINEL_MASTER: mymaster
+      SPRING_DATA_REDIS_SENTINEL_NODES: redis-sentinel:26379
+      KEYCLOAK_URL: http://host.docker.internal:8180
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis-sentinel
+    networks:
+      sentinel-net:
+        ipv4_address: 172.28.28.5
+
+networks:
+  sentinel-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.28.0/24

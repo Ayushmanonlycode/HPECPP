@@ -4,6 +4,9 @@
 networks:
   showdown-net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.29.0/24
 
 volumes:
   prometheus-data:
@@ -172,13 +175,47 @@ services:
       - "5435:5432"
     networks: [showdown-net]
 
-  sb-cart-db:
+  sb-cart-redis-master:
     image: redis:7-alpine
-    container_name: sb-cart-db
+    container_name: sb-cart-redis-master
     profiles: [spring]
     ports:
-      - "6381:6379"
-    networks: [showdown-net]
+      - "6383:6379"
+    command: redis-server
+    networks:
+      showdown-net:
+        ipv4_address: 172.29.29.250
+
+  sb-cart-redis-replica:
+    image: redis:7-alpine
+    container_name: sb-cart-redis-replica
+    profiles: [spring]
+    ports:
+      - "6384:6379"
+    command: redis-server --replicaof 172.29.29.250 6379
+    depends_on:
+      - sb-cart-redis-master
+    networks:
+      showdown-net:
+        ipv4_address: 172.29.29.251
+
+  sb-cart-redis-sentinel:
+    image: redis:7-alpine
+    container_name: sb-cart-redis-sentinel
+    profiles: [spring]
+    ports:
+      - "26382:26379"
+    command: >
+      sh -c "echo 'sentinel monitor mymaster 172.29.29.250 6379 1' > /etc/redis-sentinel.conf &&
+             echo 'sentinel down-after-milliseconds mymaster 5000' >> /etc/redis-sentinel.conf &&
+             echo 'sentinel failover-timeout mymaster 10000' >> /etc/redis-sentinel.conf &&
+             redis-server /etc/redis-sentinel.conf --sentinel"
+    depends_on:
+      - sb-cart-redis-master
+      - sb-cart-redis-replica
+    networks:
+      showdown-net:
+        ipv4_address: 172.29.29.252
 
   sb-api-gateway:
     image: nginx:alpine
@@ -332,7 +369,8 @@ services:
     container_name: sb-cart-service
     profiles: [spring]
     environment:
-      SPRING_DATA_REDIS_HOST: sb-cart-db
+      SPRING_DATA_REDIS_SENTINEL_MASTER: mymaster
+      SPRING_DATA_REDIS_SENTINEL_NODES: sb-cart-redis-sentinel:26379
       KEYCLOAK_URL: http://keycloak:8080
       JAVA_TOOL_OPTIONS: "-javaagent:/otel-agent/opentelemetry-javaagent.jar -Xmx256m"
       OTEL_SERVICE_NAME: sb-cart-service
@@ -344,8 +382,10 @@ services:
       - otel-agent-vol:/otel-agent:ro
     ports:
       - "8086:8086"
-    depends_on: [sb-cart-db, otel-agent-init]
-    networks: [showdown-net]
+    depends_on: [sb-cart-redis-sentinel, otel-agent-init]
+    networks:
+      showdown-net:
+        ipv4_address: 172.29.29.253
 
   # ── WildFly Databases ─────────────────────────────────────────
   wf-user-db:
