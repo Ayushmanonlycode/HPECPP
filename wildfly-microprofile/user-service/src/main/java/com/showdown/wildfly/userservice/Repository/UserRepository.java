@@ -36,10 +36,6 @@ public class UserRepository {
         }
     }
     public User login(String username, String password) {
-
-        System.out.println("Repository username = " + username);
-        System.out.println("Repository password = " + password);
-
         try {
             return em.createQuery(
                     "SELECT u FROM User u WHERE u.username = :username AND u.password = :password",
@@ -48,7 +44,6 @@ public class UserRepository {
                     .setParameter("password", password)
                     .getSingleResult();
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -74,5 +69,8 @@ public class UserRepository {
         } catch (Exception e) {
             return null;
         }
+    }
+    public boolean checkUser(String id){
+        return em.find(User.class, id) != null;
     }
 }

@@ -121,4 +121,7 @@ public class UserService {
         }
 
     }
+    public boolean checkUser(String id){
+       return userRepository.checkUser(id);
+    }
 }

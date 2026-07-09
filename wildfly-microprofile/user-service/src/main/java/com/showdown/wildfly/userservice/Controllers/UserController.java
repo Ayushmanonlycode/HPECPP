@@ -11,6 +11,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -75,5 +76,20 @@ public class UserController {
         return userService.login(
                 loginDto.getUsername(),
                 loginDto.getPassword());
+    }
+
+    @GET
+    @Path("/check/{id}")
+    public Response checkUser(@PathParam("id") String id) {
+
+        boolean stat= userService.checkUser(id);
+
+        if(stat){
+            return Response.ok(true).build();
+        }
+
+        else{
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
     }
 }

@@ -29,11 +29,7 @@ export default function CheckoutPage() {
     zip: user?.zip ?? '',
   });
 
-  // Redirect to cart if it's genuinely empty (not just "hasn't loaded yet")
-  // and no order has been placed. Navigation is a side effect, so it must
-  // run after render commits — calling navigate() during render mutates
-  // the router while CheckoutPage itself is still rendering, which React
-  // (correctly) rejects.
+
   const cartIsEmpty = !orderPlaced && !loading && !cartLoading && cart !== null && cart.items.length === 0;
 
   useEffect(() => {

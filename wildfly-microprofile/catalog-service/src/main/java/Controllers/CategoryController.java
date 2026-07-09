@@ -1,15 +1,12 @@
 package Controllers;
 
-import Models.Category;
 import Models.DTO.CategoryDto;
-import Repository.CategoryRepo;
 import Service.CategoryService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 

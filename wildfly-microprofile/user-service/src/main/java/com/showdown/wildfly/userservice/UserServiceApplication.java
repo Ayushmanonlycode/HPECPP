@@ -11,12 +11,5 @@ import org.eclipse.microprofile.auth.LoginConfig;
 @ApplicationPath("/")
 public class UserServiceApplication extends Application {
 
-    @Path("/health")
-    public static class HealthResource {
-        @GET
-        @Produces("text/plain")
-        public String health() {
-            return "user-service running";
-        }
-    }
+
 }

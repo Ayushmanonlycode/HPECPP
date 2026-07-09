@@ -35,6 +35,7 @@
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <!-- JPA -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
