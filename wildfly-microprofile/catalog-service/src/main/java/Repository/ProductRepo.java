@@ -43,7 +43,7 @@ public class ProductRepo {
     }
 
     public List<ProductDto> getProductsbyCategory(String categoryId) {
-        return em.createQuery("SELECT p FROM Product p WHERE p.categoryName = :categoryId", Product.class)
+        return em.createQuery("SELECT p FROM Product p WHERE p.category.id = :categoryId", Product.class)
                 .setParameter("categoryId", categoryId)
                 .getResultList()
                 .stream()

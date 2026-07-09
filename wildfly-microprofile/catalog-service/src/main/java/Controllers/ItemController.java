@@ -20,9 +20,9 @@ public class ItemController {
 
 
     @GET
-    @Path("{id}")
+    @Path("{productId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ItemDto getItemsById(@PathParam("id") String id) {
+    public List<ItemDto> getItemsById(@PathParam("productId") String id) {
         return itemService.getItemsById(id);
     }
 

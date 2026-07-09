@@ -2,6 +2,7 @@ package Controllers;
 
 import Models.Inventory;
 import Service.InventoryService;
+import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -10,7 +11,7 @@ import jakarta.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Path("/inventory")
-@RolesAllowed({"ADMIN","CUSTOMER"})
+@PermitAll
 public class InventoryController {
 
     @Inject

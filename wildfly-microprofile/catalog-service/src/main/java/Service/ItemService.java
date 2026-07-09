@@ -7,6 +7,7 @@ import Repository.ItemRepo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -24,18 +25,27 @@ public class ItemService {
         return itemRepo.addItem(item);
     }
 
-    public ItemDto getItemsById(String id) {
-        Item i = itemRepo.getItemsById(id);
+    public List<ItemDto> getItemsById(String id) {
+        List<Item> items = itemRepo.getItemsById(id);
 
-        ItemDto dto = new ItemDto();
-        dto.setId(i.getId());
-        dto.setItemName(i.getItemName());
-        dto.setListPrice(i.getListPrice());
-        dto.setSku(i.getSku());
-        dto.setImageUrl(i.getImageUrl());
-        if (i.getProduct() != null) {
-            dto.setProductId(i.getProduct().getId());
+        List<ItemDto> dto= new ArrayList<>();
+
+        for (Item i : items) {
+
+            ItemDto idto = new ItemDto();
+            idto.setId(i.getId());
+            idto.setItemName(i.getItemName());
+            idto.setListPrice(i.getListPrice());
+            idto.setSku(i.getSku());
+            idto.setImageUrl(i.getImageUrl());
+            if (i.getProduct() != null) {
+                idto.setProductId(i.getProduct().getId());
+            }
+            dto.add(idto);
+
         }
+
+
         return dto;
 
 
