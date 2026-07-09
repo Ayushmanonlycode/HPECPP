@@ -2,8 +2,6 @@ package Service;
 
 import CDI.InventoryCDI;
 import CDI.UserCDI;
-import Client.InventoryClient;
-import Client.UserClient;
 import Models.Dto.InventoryDto;
 import Models.Dto.LineItemDto;
 import Models.Dto.OrderDto;
@@ -19,7 +17,7 @@ import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.faulttolerance.Timeout;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -75,6 +73,11 @@ public class OrderCaptureService {
         for(LineItemDto itemDto : orderDto.getLineItems()) {
 
             InventoryDto inv= inventoryCDI.getInventory(itemDto.getItemSku());
+
+            if (inv == null) {
+                throw new RuntimeException(
+                        "Item not found in inventory: " + itemDto.getItemSku());
+            }
 
             BigDecimal price = itemDto.getUnitPrice();
             int quantity = itemDto.getQuantity();

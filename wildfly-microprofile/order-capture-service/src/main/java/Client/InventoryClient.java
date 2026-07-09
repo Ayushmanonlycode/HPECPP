@@ -4,11 +4,13 @@ import Models.Dto.InventoryDto;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 
 import java.util.List;
 
 @Path("/inventory")
 @RegisterRestClient(configKey = "inventory-service")
+@RegisterClientHeaders(JwtPropagationHeadersFactory.class)
 public interface InventoryClient {
 
     @GET

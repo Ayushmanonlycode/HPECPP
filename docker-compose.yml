@@ -10,6 +10,18 @@ volumes:
   prometheus-data:
   grafana-data:
   otel-agent-vol:
+  keycloak-data:
+  sb-user-db-data:
+  sb-catalog-db-data:
+  sb-inventory-db-data:
+  sb-order-capture-db-data:
+  sb-order-fulfillment-db-data:
+  wf-user-db-data:
+  wf-catalog-db-data:
+  wf-inventory-db-data:
+  wf-order-capture-db-data:
+  wf-order-fulfillment-db-data:
+
 
 services:
 
@@ -106,6 +118,7 @@ services:
       KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - keycloak-data:/opt/keycloak/data
     ports:
       - "8180:8080"
     networks: [showdown-net]
@@ -119,6 +132,8 @@ services:
       POSTGRES_DB: userdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sb-user-db-data:/var/lib/postgresql/data
     ports:
       - "5431:5432"
     networks: [showdown-net]
@@ -131,6 +146,8 @@ services:
       POSTGRES_DB: catalogdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sb-catalog-db-data:/var/lib/postgresql/data
     ports:
       - "5436:5432"
     networks: [showdown-net]
@@ -143,6 +160,8 @@ services:
       POSTGRES_DB: inventorydb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sb-inventory-db-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     networks: [showdown-net]
@@ -155,6 +174,8 @@ services:
       POSTGRES_DB: ordercapturedb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sb-order-capture-db-data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
     networks: [showdown-net]
@@ -168,6 +189,8 @@ services:
       POSTGRES_DB: orderfulfilmentdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - sb-order-fulfillment-db-data:/var/lib/postgresql/data
 
     ports:
       - "5435:5432"
@@ -357,6 +380,8 @@ services:
       POSTGRES_DB: userdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - wf-user-db-data:/var/lib/postgresql/data
     ports:
       - "5441:5432"
     networks: [showdown-net]
@@ -369,6 +394,8 @@ services:
       POSTGRES_DB: catalogdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - wf-catalog-db-data:/var/lib/postgresql/data
     ports:
       - "5442:5432"
     networks: [showdown-net]
@@ -381,6 +408,8 @@ services:
       POSTGRES_DB: inventorydb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - wf-inventory-db-data:/var/lib/postgresql/data
     ports:
       - "5443:5432"
     networks: [showdown-net]
@@ -393,6 +422,8 @@ services:
       POSTGRES_DB: ordercapturedb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - wf-order-capture-db-data:/var/lib/postgresql/data
     ports:
       - "5444:5432"
     networks: [showdown-net]
@@ -403,9 +434,11 @@ services:
     profiles: [wildfly]
     environment:
 
-      POSTGRES_DB: orderfulfilmentdb
+      POSTGRES_DB: orderfulfillmentdb
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - wf-order-fulfillment-db-data:/var/lib/postgresql/data
 
     ports:
       - "5445:5432"
@@ -444,7 +477,8 @@ services:
     profiles: [wildfly]
     command: >
       sh -c "sleep 15 &&
-         echo 'sentinel monitor mymaster 172.18.0.2 6379 2' > /sentinel.conf &&
+         MASTER_IP=$$(getent hosts wf-cart-db-master | awk '{print $$1}') &&
+         echo \"sentinel monitor mymaster $$MASTER_IP 6379 2\" > /sentinel.conf &&
          echo 'sentinel down-after-milliseconds mymaster 5000' >> /sentinel.conf &&
          echo 'sentinel failover-timeout mymaster 10000' >> /sentinel.conf &&
          echo 'sentinel parallel-syncs mymaster 1' >> /sentinel.conf &&
@@ -460,7 +494,8 @@ services:
     profiles: [wildfly]
     command: >
         sh -c "sleep 15 &&
-         echo 'sentinel monitor mymaster 172.18.0.2 6379 2' > /sentinel.conf &&
+         MASTER_IP=$$(getent hosts wf-cart-db-master | awk '{print $$1}') &&
+         echo \"sentinel monitor mymaster $$MASTER_IP 6379 2\" > /sentinel.conf &&
          echo 'sentinel down-after-milliseconds mymaster 5000' >> /sentinel.conf &&
          echo 'sentinel failover-timeout mymaster 10000' >> /sentinel.conf &&
          echo 'sentinel parallel-syncs mymaster 1' >> /sentinel.conf &&
@@ -476,7 +511,8 @@ services:
     profiles: [wildfly]
     command: >
         sh -c "sleep 15 &&
-         echo 'sentinel monitor mymaster 172.18.0.2 6379 2' > /sentinel.conf &&
+         MASTER_IP=$$(getent hosts wf-cart-db-master | awk '{print $$1}') &&
+         echo \"sentinel monitor mymaster $$MASTER_IP 6379 2\" > /sentinel.conf &&
          echo 'sentinel down-after-milliseconds mymaster 5000' >> /sentinel.conf &&
          echo 'sentinel failover-timeout mymaster 10000' >> /sentinel.conf &&
          echo 'sentinel parallel-syncs mymaster 1' >> /sentinel.conf &&
@@ -513,7 +549,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "9081:8080"
-    depends_on: [wf-user-db]
+    depends_on: [wf-user-db, keycloak]
     networks: [showdown-net]
 
   wf-catalog-service:
@@ -577,6 +613,19 @@ services:
     depends_on: [wf-order-fulfillment-db]
     networks: [showdown-net]
 
-
-
-
+  wf-api-gateway:
+    build:
+      context: ./wildfly-microprofile
+      dockerfile: api-gateway/Dockerfile
+    container_name: wf-api-gateway
+    profiles: [wildfly]
+    ports:
+      - "9080:9080"
+    depends_on:
+      - wf-user-service
+      - wf-catalog-service
+      - wf-inventory-service
+      - wf-order-capture-service
+      - wf-order-fulfillment-service
+      - wf-cart-service
+    networks: [showdown-net]

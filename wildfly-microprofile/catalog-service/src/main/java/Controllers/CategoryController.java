@@ -1,17 +1,17 @@
 package Controllers;
 
-import Models.Category;
 import Models.DTO.CategoryDto;
-import Repository.CategoryRepo;
 import Service.CategoryService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
 
 @Path("/categories")
+@PermitAll
 public class CategoryController {
 
     @Inject
@@ -37,8 +37,8 @@ public class CategoryController {
 
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/add")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response addCategory(CategoryDto category) {
         int res= categoryService.addCategory(category);
 

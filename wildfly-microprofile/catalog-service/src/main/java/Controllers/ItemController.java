@@ -1,17 +1,17 @@
 package Controllers;
 
 import Models.DTO.ItemDto;
-import Models.Item;
 import Service.ItemService;
-import Service.ProductService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
 
 @Path("/items")
+@PermitAll
 public class ItemController {
 
     @Inject

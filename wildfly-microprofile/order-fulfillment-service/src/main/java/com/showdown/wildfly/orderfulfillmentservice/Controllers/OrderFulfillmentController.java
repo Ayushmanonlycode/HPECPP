@@ -7,10 +7,12 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
 @Path("/fulfillment")
+@RolesAllowed({"ADMIN", "CUSTOMER"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class OrderFulfillmentController {

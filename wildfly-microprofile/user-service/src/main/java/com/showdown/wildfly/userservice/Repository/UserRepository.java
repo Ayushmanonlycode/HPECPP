@@ -59,7 +59,17 @@ public class UserRepository {
         }
     }
 
-
+    public User findByUsername(String username) {
+        try {
+            return em.createQuery(
+                    "SELECT u FROM User u WHERE u.username = :username",
+                    User.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     public boolean checkUser(String id){
         return em.find(User.class, id) != null;
     }
