@@ -1,7 +1,6 @@
 package com.showdown.springboot.userservice.controller;
 
-import com.showdown.springboot.userservice.dto.AuthResponseDto;
-import com.showdown.springboot.userservice.dto.UserLoginDto;
+
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserRegistrationDto;
 import com.showdown.springboot.userservice.service.UserService;
@@ -36,14 +35,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(profile);
     }
 
-    @PostMapping("/login")
-    @Operation(summary = "Login with username and password", description = "Validates credentials. Public endpoint. For JWT auth use Keycloak token endpoint.")
-    @ApiResponse(responseCode = "200", description = "Login successful")
-    @ApiResponse(responseCode = "401", description = "Invalid credentials")
-    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginDto dto) {
-        AuthResponseDto response = userService.login(dto);
-        return ResponseEntity.ok(response);
-    }
 
     @GetMapping
     public ResponseEntity<List<UserProfileDto>> listUsers() {

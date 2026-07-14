@@ -1,15 +1,18 @@
 package com.showdown.springboot.userservice.service;
 
-import com.showdown.springboot.userservice.dto.AuthResponseDto;
-import com.showdown.springboot.userservice.dto.UserLoginDto;
+
 import com.showdown.springboot.userservice.dto.UserProfileDto;
 import com.showdown.springboot.userservice.dto.UserRegistrationDto;
 import com.showdown.springboot.userservice.entity.User;
 import com.showdown.springboot.userservice.exception.DuplicateResourceException;
 import com.showdown.springboot.userservice.exception.ResourceNotFoundException;
 import com.showdown.springboot.userservice.repository.UserRepository;
-import com.showdown.springboot.userservice.security.JwtTokenProvider;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +26,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = new User();
+        user.setId(UUID.randomUUID());
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(dto.getLastName());
         user.setPhone(dto.getPhone());
         user.setAddress(dto.getAddress());
+        user.setAddress2(dto.getAddress2());
         user.setCity(dto.getCity());
         user.setState(dto.getState());
         user.setZip(dto.getZip());
@@ -57,32 +59,17 @@ public class UserServiceImpl implements UserService {
         return toProfileDto(saved);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public AuthResponseDto login(UserLoginDto dto) {
-        User user = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid username or password");
-        }
-
-        String token = jwtTokenProvider.generateToken(user.getUsername());
-        return new AuthResponseDto(token, toProfileDto(user));
-    }
 
     @Override
     @Transactional(readOnly = true)
     public UserProfileDto getProfile(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        User user = getUserOrProvision(id);
         return toProfileDto(user);
     }
 
     @Override
     public UserProfileDto updateProfile(UUID id, UserRegistrationDto dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        User user = getUserOrProvision(id);
 
         // Check for duplicate username/email only if changed
         if (!user.getUsername().equals(dto.getUsername())
@@ -101,6 +88,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(dto.getLastName());
         user.setPhone(dto.getPhone());
         user.setAddress(dto.getAddress());
+        user.setAddress2(dto.getAddress2());
         user.setCity(dto.getCity());
         user.setState(dto.getState());
         user.setZip(dto.getZip());
@@ -112,13 +100,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfileDto partialUpdateProfile(UUID id, com.showdown.springboot.userservice.dto.UserProfileUpdateDto dto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        User user = getUserOrProvision(id);
 
         if (dto.getFirstName() != null) user.setFirstName(dto.getFirstName());
         if (dto.getLastName() != null) user.setLastName(dto.getLastName());
         if (dto.getPhone() != null) user.setPhone(dto.getPhone());
         if (dto.getAddress() != null) user.setAddress(dto.getAddress());
+        if (dto.getAddress2() != null) user.setAddress2(dto.getAddress2());
         if (dto.getCity() != null) user.setCity(dto.getCity());
         if (dto.getState() != null) user.setState(dto.getState());
         if (dto.getZip() != null) user.setZip(dto.getZip());
@@ -144,7 +132,37 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    // ── Mapping helper ───────────────────────────────────────────
+    // ── Helper Methods ───────────────────────────────────────────
+
+    private User getUserOrProvision(UUID id) {
+        return userRepository.findById(id).orElseGet(() -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth instanceof JwtAuthenticationToken jwtAuth) {
+                Jwt jwt = jwtAuth.getToken();
+                if (id.toString().equals(jwt.getSubject())) {
+                    User newUser = new User();
+                    newUser.setId(id);
+                    String preferredUsername = jwt.getClaimAsString("preferred_username") != null ? jwt.getClaimAsString("preferred_username") : jwt.getSubject();
+                    if (userRepository.existsByUsername(preferredUsername)) {
+                        preferredUsername = preferredUsername + "_" + UUID.randomUUID().toString().substring(0, 8);
+                    }
+                    newUser.setUsername(preferredUsername);
+
+                    String email = jwt.getClaimAsString("email") != null ? jwt.getClaimAsString("email") : jwt.getSubject() + "@example.com";
+                    if (userRepository.existsByEmail(email)) {
+                        email = UUID.randomUUID().toString().substring(0, 8) + "_" + email;
+                    }
+                    newUser.setEmail(email);
+
+                    newUser.setFirstName(jwt.getClaimAsString("given_name"));
+                    newUser.setLastName(jwt.getClaimAsString("family_name"));
+                    newUser.setPassword("EXTERNAL"); // Dummy password as authentication is handled by Keycloak
+                    return userRepository.save(newUser);
+                }
+            }
+            throw new ResourceNotFoundException("User", id);
+        });
+    }
 
     private UserProfileDto toProfileDto(User user) {
         UserProfileDto dto = new UserProfileDto();
@@ -155,6 +173,7 @@ public class UserServiceImpl implements UserService {
         dto.setLastName(user.getLastName());
         dto.setPhone(user.getPhone());
         dto.setAddress(user.getAddress());
+        dto.setAddress2(user.getAddress2());
         dto.setCity(user.getCity());
         dto.setState(user.getState());
         dto.setZip(user.getZip());

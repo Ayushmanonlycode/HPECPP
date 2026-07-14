@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
+=======
+import React, { useState, useEffect } from 'react';
+>>>>>>> master
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +15,7 @@ import './CheckoutPage.css';
 export default function CheckoutPage() {
   const { cart, loading: cartLoading, clearCart } = useCart();
   const { userId, user, login } = useAuth();
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,15 +23,15 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [formData, setFormData] = useState({
-    fullName: user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : '',
-    phone: user?.phone ?? '',
-    email: user?.email ?? '',
-    address1: user?.address ?? '',
+    fullName: '',
+    phone: '',
+    email: '',
+    address1: '',
     address2: '',
-    city: user?.city ?? '',
-    state: user?.state ?? '',
-    country: user?.country ?? '',
-    zip: user?.zip ?? '',
+    city: '',
+    state: '',
+    country: '',
+    zip: '',
   });
 
 
@@ -66,21 +71,23 @@ export default function CheckoutPage() {
         })),
       });
 
-      // Save shipping address if user has none saved
-      if (user && !user.address) {
+      // Always save/update the profile with the latest shipping details
+      if (user) {
         try {
-          const [firstName, ...rest] = formData.fullName.split(' ');
-          const updatedUser = await authApi.updateProfile(userId, {
-            firstName: firstName || undefined,
-            lastName: rest.join(' ') || undefined,
+          const nameParts = formData.fullName.split(' ');
+          await authApi.updateProfile(userId, {
+            firstName: nameParts[0] || undefined,
+            lastName: nameParts.slice(1).join(' ') || undefined,
             phone: formData.phone || undefined,
             address: formData.address1 || undefined,
+            address2: formData.address2 || undefined,
             city: formData.city || undefined,
             state: formData.state || undefined,
             zip: formData.zip || undefined,
             country: formData.country || undefined,
           });
-          login(updatedUser);
+          // Refresh context so the next checkout visit pre-fills correctly
+          await refreshProfile();
         } catch (profileErr) {
           // Non-fatal: silently log — the order still succeeded
           console.error('Failed to update user profile with new address', profileErr);
