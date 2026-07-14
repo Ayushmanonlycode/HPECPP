@@ -8,8 +8,9 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # Keycloak JWKS endpoint — override via KEYCLOAK_URL env var in Docker
-          issuer-uri: ${KEYCLOAK_URL:http://localhost:8180}/realms/jpetstore
+          # Keycloak JWKS endpoint (using jwk-set-uri directly prevents container boot-time issuer connection failures)
+          # issuer-uri: ${KEYCLOAK_URL:http://localhost:8180}/realms/jpetstore
+          jwk-set-uri: ${KEYCLOAK_URL:http://keycloak:8080}/realms/jpetstore/protocol/openid-connect/certs
   cloud:
     gateway:
       globalcors:
