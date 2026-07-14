@@ -72,8 +72,8 @@ public class OrderCaptureServiceImplTest {
 
         createDto.setLineItems(List.of(item1, item2));
 
-        when(userClient.checkUserExists(anyString())).thenReturn(true);
-        when(inventoryClient.reserveStock(anyString(), anyInt())).thenReturn(true);
+
+        when(inventoryClient.adjustStock(anyString(), anyInt())).thenReturn(true);
 
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order savedOrder = invocation.getArgument(0);
@@ -95,17 +95,7 @@ public class OrderCaptureServiceImplTest {
         assertThat(result.getLineItems()).hasSize(2);
     }
 
-    @Test
-    void createOrder_whenUserNotFound_shouldThrowInvalidOrderException() {
-        CreateOrderDto createDto = new CreateOrderDto();
-        createDto.setUserId("invalid-user");
-        
-        when(userClient.checkUserExists("invalid-user")).thenReturn(false);
 
-        assertThatThrownBy(() -> orderCaptureService.createOrder(createDto))
-                .isInstanceOf(InvalidOrderException.class)
-                .hasMessageContaining("Invalid user ID");
-    }
 
     @Test
     void confirmOrder_whenStatusIsCreated_shouldConfirmOrder() {

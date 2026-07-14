@@ -174,7 +174,7 @@ vars.put(&quot;JWT_TOKEN&quot;, json.access_token)
         </HeaderManager>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="02 Load - 50 Concurrent Users">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="02 Load - 50 Concurrent Users" enabled="true">
         <intProp name="ThreadGroup.num_threads">50</intProp>
         <stringProp name="ThreadGroup.ramp_time">${RAMP_UP_SECONDS}</stringProp>
         <stringProp name="ThreadGroup.duration">${DURATION_SECONDS}</stringProp>
@@ -385,7 +385,7 @@ vars.put(&quot;UNIT_PRICE&quot;, json[0].listPrice.toString())
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>

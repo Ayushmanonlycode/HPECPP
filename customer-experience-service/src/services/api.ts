@@ -5,14 +5,18 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach userId and Authorization header from localStorage on every request
 api.interceptors.request.use((config) => {
   const userId = localStorage.getItem('userId');
   if (userId) {
     config.headers['X-User-Id'] = userId;
   }
   const token = localStorage.getItem('token');
-  if (token) {
+  // Do not attach the Authorization token for public endpoints (login, register)
+  // because Spring Security will attempt to validate it, and if it's expired,
+  // it will reject the request with 401 Unauthorized before checking permitAll rules.
+  const isPublicEndpoint = config.url?.includes('/register') || config.url?.includes('/login');
+  
+  if (token && !isPublicEndpoint) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
   return config;
