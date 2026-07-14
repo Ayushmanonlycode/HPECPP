@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import { useState, useEffect } from 'react';
-=======
-import React, { useState, useEffect } from 'react';
->>>>>>> master
+
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../context/AuthContext';
