@@ -16,7 +16,7 @@ RUN /opt/jboss/wildfly/bin/jboss-cli.sh --command=\
   --dependencies=javax.api,java.sql"
 
 RUN /opt/jboss/wildfly/bin/standalone.sh --admin-only & \
-    sleep 10 && \
+    until /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="ls" > /dev/null 2>&1; do sleep 5; done && \
     /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="\
       /extension=org.wildfly.extension.opentelemetry:add(),\
       /subsystem=opentelemetry:add(),\

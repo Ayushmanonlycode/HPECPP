@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import com.showdown.springboot.orderfulfilmentservice.client.OrderCaptureClient;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -28,11 +29,14 @@ public class OrderFulfilmentServiceImplTest {
     @Mock
     private FulfilmentRepository fulfilmentRepository;
 
+    @Mock
+    private OrderCaptureClient orderCaptureClient;
+
     private OrderFulfilmentServiceImpl orderFulfilmentService;
 
     @BeforeEach
     void setUp() {
-        orderFulfilmentService = new OrderFulfilmentServiceImpl(fulfilmentRepository);
+        orderFulfilmentService = new OrderFulfilmentServiceImpl(fulfilmentRepository, orderCaptureClient);
     }
 
     @Test
@@ -96,6 +100,7 @@ public class OrderFulfilmentServiceImplTest {
 
         when(fulfilmentRepository.findById(id)).thenReturn(Optional.of(f));
         when(fulfilmentRepository.save(any(Fulfilment.class))).thenReturn(f);
+        when(orderCaptureClient.confirmOrder(any())).thenReturn(true);
 
         FulfilmentDto result = orderFulfilmentService.markShipped(id, dto);
 

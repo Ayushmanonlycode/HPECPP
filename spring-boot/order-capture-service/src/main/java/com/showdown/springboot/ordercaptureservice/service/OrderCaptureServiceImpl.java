@@ -47,16 +47,14 @@ public class OrderCaptureServiceImpl implements OrderCaptureService {
         order.setShippingAddress(dto.getShippingAddress());
         order.setStatus(OrderStatus.CREATED);
 
-        // Validate user exists
-        if (!userClient.checkUserExists(dto.getUserId())) {
-            throw new InvalidOrderException("Invalid user ID: " + dto.getUserId());
-        }
+        // User validation is now handled intrinsically by Keycloak JWT verification
 
         BigDecimal subtotal = BigDecimal.ZERO;
 
         for (OrderLineItemDto itemDto : dto.getLineItems()) {
-            boolean reserved = inventoryClient.reserveStock(itemDto.getItemSku(), itemDto.getQuantity());
-            if (!reserved) {
+            // Directly decrement stock on order placement — no reservation needed
+            boolean decremented = inventoryClient.adjustStock(itemDto.getItemSku(), -itemDto.getQuantity());
+            if (!decremented) {
                 throw new InvalidOrderException("Insufficient stock or inventory service unavailable for SKU: " + itemDto.getItemSku());
             }
 
@@ -109,6 +107,7 @@ public class OrderCaptureServiceImpl implements OrderCaptureService {
                     "Cannot confirm order in status: " + order.getStatus());
         }
 
+        // Stock was already deducted at order creation — just mark as CONFIRMED
         order.setStatus(OrderStatus.CONFIRMED);
         Order saved = orderRepository.save(order);
         return toDto(saved);

@@ -94,6 +94,7 @@ export interface UserProfile {
   lastName: string | null;
   phone: string | null;
   address: string | null;
+  address2: string | null;
   city: string | null;
   state: string | null;
   zip: string | null;
@@ -108,6 +109,7 @@ export interface UserProfileUpdateDto {
   lastName?: string;
   phone?: string;
   address?: string;
+  address2?: string;
   city?: string;
   state?: string;
   zip?: string;

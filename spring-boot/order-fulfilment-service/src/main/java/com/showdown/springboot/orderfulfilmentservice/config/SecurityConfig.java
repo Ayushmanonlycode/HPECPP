@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Actuator health/metrics are accessible without a token
                         .requestMatchers("/actuator/**").permitAll()
+                        // Internal service-to-service: allow order-capture-service to create fulfilments
+                        .requestMatchers("/api/fulfilments").permitAll()
                         // All other operations require authentication
                         .anyRequest().authenticated()
                 )

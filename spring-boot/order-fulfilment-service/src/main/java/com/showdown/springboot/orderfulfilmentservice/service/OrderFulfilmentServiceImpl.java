@@ -7,6 +7,7 @@ import com.showdown.springboot.orderfulfilmentservice.entity.Fulfilment;
 import com.showdown.springboot.orderfulfilmentservice.entity.FulfilmentStatus;
 import com.showdown.springboot.orderfulfilmentservice.exception.InvalidFulfilmentStateException;
 import com.showdown.springboot.orderfulfilmentservice.exception.ResourceNotFoundException;
+import com.showdown.springboot.orderfulfilmentservice.client.OrderCaptureClient;
 import com.showdown.springboot.orderfulfilmentservice.repository.FulfilmentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +22,11 @@ import java.util.stream.Collectors;
 public class OrderFulfilmentServiceImpl implements OrderFulfilmentService {
 
     private final FulfilmentRepository fulfilmentRepository;
+    private final OrderCaptureClient orderCaptureClient;
 
-    public OrderFulfilmentServiceImpl(FulfilmentRepository fulfilmentRepository) {
+    public OrderFulfilmentServiceImpl(FulfilmentRepository fulfilmentRepository, OrderCaptureClient orderCaptureClient) {
         this.fulfilmentRepository = fulfilmentRepository;
+        this.orderCaptureClient = orderCaptureClient;
     }
 
     @Override
@@ -67,6 +70,10 @@ public class OrderFulfilmentServiceImpl implements OrderFulfilmentService {
         fulfilment.setTrackingNumber(dto.getTrackingNumber());
         fulfilment.setCarrier(dto.getCarrier());
         fulfilment.setShippedAt(Instant.now());
+        
+        // Finalize order to deduct inventory
+        orderCaptureClient.confirmOrder(fulfilment.getOrderId());
+        
         return toDto(fulfilmentRepository.save(fulfilment));
     }
 

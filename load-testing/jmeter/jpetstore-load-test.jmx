@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="JPetStore Load Test — Microservices Showdown" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="JPetStore Load Test - Microservices Showdown">
       <stringProp name="TestPlan.comments">
         Standardised load test plan for comparing Spring Boot vs WildFly MicroProfile.
         Switch between stacks by changing the BASE_URL user-defined variable.
         Login is excluded from the load workflow (JWT is pre-fetched once in the setUp group).
-        Workflow: Browse categories → List products → View item → Add to cart → Place order.
+        Workflow: Browse categories - List products - View item - Add to cart - Place order.
       </stringProp>
-      <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
         <collectionProp name="Arguments.arguments">
-          <!-- Switch between Spring Boot (8080) and WildFly (9080) by changing BASE_URL -->
-          <elementProp name="BASE_URL" elementType="Argument">
-            <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">http://localhost:8080</stringProp>
+          <elementProp name="BASE_PROTOCOL" elementType="Argument">
+            <stringProp name="Argument.name">BASE_PROTOCOL</stringProp>
+            <stringProp name="Argument.value">http</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="KEYCLOAK_URL" elementType="Argument">
-            <stringProp name="Argument.name">KEYCLOAK_URL</stringProp>
-            <stringProp name="Argument.value">http://localhost:8180</stringProp>
+          <elementProp name="BASE_HOST" elementType="Argument">
+            <stringProp name="Argument.name">BASE_HOST</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="BASE_PORT" elementType="Argument">
+            <stringProp name="Argument.name">BASE_PORT</stringProp>
+            <stringProp name="Argument.value">8080</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="KEYCLOAK_PROTOCOL" elementType="Argument">
+            <stringProp name="Argument.name">KEYCLOAK_PROTOCOL</stringProp>
+            <stringProp name="Argument.value">http</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="KEYCLOAK_HOST" elementType="Argument">
+            <stringProp name="Argument.name">KEYCLOAK_HOST</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="KEYCLOAK_PORT" elementType="Argument">
+            <stringProp name="Argument.name">KEYCLOAK_PORT</stringProp>
+            <stringProp name="Argument.value">8180</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="KEYCLOAK_CLIENT_ID" elementType="Argument">
@@ -55,23 +72,31 @@
           </elementProp>
         </collectionProp>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
-
-      <!-- ═══════════════════════════════════════════════════════════
-           setUp Thread Group — Authenticate ONCE and store JWT
-           This is the key design from Kamala's direction:
-           login happens once, not in the load loop.
-           ═══════════════════════════════════════════════════════════ -->
-      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="01 setUp — Obtain JWT Token" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="01 setUp - Obtain JWT Token">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <longProp name="ThreadGroup.duration">60</longProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-        <stringProp name="ThreadGroup.duration">60</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
       </SetupThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST Keycloak Token" enabled="true">
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments">
+          <stringProp name="HTTPSampler.domain">${KEYCLOAK_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${KEYCLOAK_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${KEYCLOAK_PROTOCOL}</stringProp>
+          <stringProp name="HTTPSampler.path">/realms/jpetstore/protocol/openid-connect/token</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments">
               <elementProp name="grant_type" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">true</boolProp>
@@ -105,32 +130,40 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.domain">${__groovy(vars.get("KEYCLOAK_URL").replace("http://","").split(":")[0])}</stringProp>
-          <stringProp name="HTTPSampler.port">${__groovy(vars.get("KEYCLOAK_URL").contains(":") ? vars.get("KEYCLOAK_URL").split(":")[2] : "80")}</stringProp>
-          <stringProp name="HTTPSampler.path">/realms/jpetstore/protocol/openid-connect/token</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSONPathExtractor guiclass="JSONPathExtractorGui" testclass="JSONPathExtractor" testname="Extract access_token" enabled="true">
-            <stringProp name="JSONPathExtractor.referenceName">JWT_TOKEN</stringProp>
-            <stringProp name="JSONPathExtractor.jsonPathExpr">$.access_token</stringProp>
-            <stringProp name="JSONPathExtractor.defaultValue">TOKEN_NOT_FOUND</stringProp>
-            <stringProp name="JSONPathExtractor.scope">all</stringProp>
-          </JSONPathExtractor>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Keycloak Host Header" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="Host" elementType="Header">
+                <stringProp name="Header.name">Host</stringProp>
+                <stringProp name="Header.value">keycloak:8080</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Extract access_token" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">
+def json = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+vars.put(&quot;JWT_TOKEN&quot;, json.access_token)
+            </stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PostProcessor>
           <hashTree/>
           <BeanShellPostProcessor guiclass="TestBeanGUI" testclass="BeanShellPostProcessor" testname="Store JWT in property" enabled="true">
             <stringProp name="script">
-              String token = vars.get("JWT_TOKEN");
-              props.put("SHARED_JWT", token);
-              log.info("JWT token obtained and stored as shared property. Length: " + token.length());
+              String token = vars.get(&quot;JWT_TOKEN&quot;);
+              props.put(&quot;SHARED_JWT&quot;, token);
+              log.info(&quot;JWT token obtained and stored as shared property. Length: &quot; + token.length());
             </stringProp>
+            <boolProp name="resetInterpreter">false</boolProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
           </BeanShellPostProcessor>
           <hashTree/>
         </hashTree>
-
-        <!-- Header for the token request -->
         <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Content-Type Form" enabled="true">
           <collectionProp name="HeaderManager.headers">
             <elementProp name="Content-Type" elementType="Header">
@@ -141,29 +174,35 @@
         </HeaderManager>
         <hashTree/>
       </hashTree>
-
-      <!-- ═══════════════════════════════════════════════════════════
-           Thread Group 1 — 50 Concurrent Users
-           ═══════════════════════════════════════════════════════════ -->
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="02 Load — 50 Concurrent Users" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <intProp name="LoopController.loops">-1</intProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">50</stringProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="02 Load - 50 Concurrent Users" enabled="true">
+        <intProp name="ThreadGroup.num_threads">50</intProp>
         <stringProp name="ThreadGroup.ramp_time">${RAMP_UP_SECONDS}</stringProp>
-        <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.duration">${DURATION_SECONDS}</stringProp>
-        <stringProp name="ThreadGroup.delay">0</stringProp>
+        <longProp name="ThreadGroup.delay">0</longProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <intProp name="LoopController.loops">-1</intProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
       </ThreadGroup>
       <hashTree>
-        <!-- Inject JWT on every request — no login overhead in the load loop -->
+        <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+          <stringProp name="HTTPSampler.domain">${BASE_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${BASE_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${BASE_PROTOCOL}</stringProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.implementation"></stringProp>
+        </ConfigTestElement>
+        <hashTree/>
         <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Authorization Header" enabled="true">
           <collectionProp name="HeaderManager.headers">
             <elementProp name="Authorization" elementType="Header">
               <stringProp name="Header.name">Authorization</stringProp>
-              <stringProp name="Argument.value">Bearer ${__property(SHARED_JWT)}</stringProp>
+              <stringProp name="Header.value">Bearer ${__property(SHARED_JWT)}</stringProp>
             </elementProp>
             <elementProp name="Content-Type" elementType="Header">
               <stringProp name="Header.name">Content-Type</stringProp>
@@ -172,25 +211,34 @@
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-
-        <!-- Step 1: Browse categories -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="01 GET /api/categories" enabled="true">
-          <stringProp name="HTTPSampler.path">${BASE_URL}/api/categories</stringProp>
+          <stringProp name="HTTPSampler.path">/api/categories</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSONPathExtractor guiclass="JSONPathExtractorGui" testclass="JSONPathExtractor" testname="Extract first category ID" enabled="true">
-            <stringProp name="JSONPathExtractor.referenceName">CATEGORY_ID</stringProp>
-            <stringProp name="JSONPathExtractor.jsonPathExpr">$[0].id</stringProp>
-            <stringProp name="JSONPathExtractor.defaultValue">FISH</stringProp>
-          </JSONPathExtractor>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Extract first category ID" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">
+def json = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+vars.put(&quot;CATEGORY_ID&quot;, json[0].id)
+            </stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PostProcessor>
           <hashTree/>
         </hashTree>
-
-        <!-- Step 2: List products in category -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02 GET /api/products" enabled="true">
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+          <stringProp name="HTTPSampler.path">/api/products</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
             <collectionProp name="Arguments.arguments">
               <elementProp name="category" elementType="HTTPArgument">
                 <stringProp name="Argument.value">${CATEGORY_ID}</stringProp>
@@ -199,78 +247,144 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.path">${BASE_URL}/api/products</stringProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <JSONPathExtractor guiclass="JSONPathExtractorGui" testclass="JSONPathExtractor" testname="Extract first item SKU" enabled="true">
-            <stringProp name="JSONPathExtractor.referenceName">ITEM_SKU</stringProp>
-            <stringProp name="JSONPathExtractor.jsonPathExpr">$[0].items[0].itemSku</stringProp>
-            <stringProp name="JSONPathExtractor.defaultValue">EST-1</stringProp>
-          </JSONPathExtractor>
-          <hashTree/>
-          <JSONPathExtractor guiclass="JSONPathExtractorGui" testclass="JSONPathExtractor" testname="Extract unit price" enabled="true">
-            <stringProp name="JSONPathExtractor.referenceName">UNIT_PRICE</stringProp>
-            <stringProp name="JSONPathExtractor.jsonPathExpr">$[0].items[0].listPrice</stringProp>
-            <stringProp name="JSONPathExtractor.defaultValue">10.00</stringProp>
-          </JSONPathExtractor>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Extract first product ID" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">
+def json = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+vars.put(&quot;PRODUCT_ID&quot;, json[0].id)
+            </stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PostProcessor>
           <hashTree/>
         </hashTree>
-
-        <!-- Step 3: View item detail -->
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="03 GET /api/items/{sku}" enabled="true">
-          <stringProp name="HTTPSampler.path">${BASE_URL}/api/items/${ITEM_SKU}</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="02.5 GET /api/items" enabled="true">
+          <stringProp name="HTTPSampler.path">/api/items</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="productId" elementType="HTTPArgument">
+                <stringProp name="Argument.value">${PRODUCT_ID}</stringProp>
+                <stringProp name="Argument.name">productId</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Extract first item SKU" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">
+def json = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+vars.put(&quot;ITEM_SKU&quot;, json[0].sku)
+            </stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PostProcessor>
+          <hashTree/>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Extract unit price" enabled="true">
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="script">
+def json = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+vars.put(&quot;UNIT_PRICE&quot;, json[0].listPrice.toString())
+            </stringProp>
+            <stringProp name="scriptLanguage">groovy</stringProp>
+          </JSR223PostProcessor>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="03 GET /api/items/{sku}" enabled="true">
+          <stringProp name="HTTPSampler.path">/api/items/${ITEM_SKU}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-
-        <!-- Step 4: Add to cart -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="04 POST /api/cart/{userId}/items" enabled="true">
+          <stringProp name="HTTPSampler.path">/api/cart/perf-test-user-${__threadNum}/items</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
-                <stringProp name="Argument.value">{"itemSku":"${ITEM_SKU}","productName":"Test Pet","quantity":1,"unitPrice":${UNIT_PRICE}}</stringProp>
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&quot;itemSku&quot;:&quot;${ITEM_SKU}&quot;,&quot;productName&quot;:&quot;Test Pet&quot;,&quot;quantity&quot;:1,&quot;unitPrice&quot;:${UNIT_PRICE}}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.path">${BASE_URL}/api/cart/perf-test-user-${__threadNum}/items</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
         </HTTPSamplerProxy>
         <hashTree/>
-
-        <!-- Step 5: Place order — this is the PRIMARY stress endpoint -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="05 POST /api/orders" enabled="true">
+          <stringProp name="HTTPSampler.path">/api/orders</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
-                <stringProp name="Argument.value">{"userId":"perf-test-user-${__threadNum}","shippingAddress":"123 Load Test Lane, Perf City","lineItems":[{"itemSku":"${ITEM_SKU}","productName":"Test Pet","quantity":1,"unitPrice":${UNIT_PRICE}}]}</stringProp>
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&quot;userId&quot;:&quot;perf-test-user-${__threadNum}&quot;,&quot;customerName&quot;:&quot;Test User ${__threadNum}&quot;,&quot;shippingAddress&quot;:&quot;123 Load Test Lane, Perf City&quot;,&quot;lineItems&quot;:[{&quot;itemSku&quot;:&quot;${ITEM_SKU}&quot;,&quot;productName&quot;:&quot;Test Pet&quot;,&quot;quantity&quot;:1,&quot;unitPrice&quot;:${UNIT_PRICE}}]}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="HTTPSampler.path">${BASE_URL}/api/orders</stringProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
         </HTTPSamplerProxy>
         <hashTree/>
-
-        <!-- Think time: 1–3 seconds between iterations (realistic user pacing) -->
-        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think Time 1–3s" enabled="true">
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think Time 1-3s" enabled="true">
           <stringProp name="ConstantTimer.delay">1000</stringProp>
           <stringProp name="RandomTimer.range">2000</stringProp>
         </UniformRandomTimer>
         <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
       </hashTree>
-
-      <!-- ═══════════════════════════════════════════════════════════
-           Listeners — Results saved to CSV for evidence
-           ═══════════════════════════════════════════════════════════ -->
       <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
@@ -308,7 +422,6 @@
         <stringProp name="filename">./results/jpetstore-results-50users.csv</stringProp>
       </ResultCollector>
       <hashTree/>
-
       <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
@@ -321,12 +434,25 @@
             <label>true</label>
             <code>true</code>
             <message>true</message>
+            <threadName>false</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>false</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
           </value>
         </objProp>
         <stringProp name="filename">./results/jpetstore-aggregate-50users.csv</stringProp>
       </ResultCollector>
       <hashTree/>
-
     </hashTree>
   </hashTree>
 </jmeterTestPlan>
