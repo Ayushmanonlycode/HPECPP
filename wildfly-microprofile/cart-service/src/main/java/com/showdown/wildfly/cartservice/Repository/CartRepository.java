@@ -14,10 +14,15 @@
 
     import redis.clients.jedis.Jedis;
     import redis.clients.jedis.JedisPool;
+    import redis.clients.jedis.JedisSentinelPool;
     import redis.clients.jedis.exceptions.JedisException;
+    import redis.clients.jedis.util.Pool;
 
     import java.math.BigDecimal;
     import java.util.ArrayList;
+    import java.util.Arrays;
+    import java.util.HashSet;
+    import java.util.Set;
 
     import java.util.logging.Logger;
 
@@ -34,13 +39,33 @@
         @ConfigProperty(name = "redis.port")
         int redisPort;
 
-        private JedisPool pool;
+
+        @Inject
+        @ConfigProperty(name = "redis.sentinel.hosts", defaultValue = "")
+        String sentinelHosts;
+
+        @Inject
+        @ConfigProperty(name = "redis.master.name", defaultValue = "mymaster")
+        String masterName;
+
+
+        private Pool<Jedis> pool;
         private final Jsonb jsonb = JsonbBuilder.create();
 
         @PostConstruct
         void init() {
-            pool = new JedisPool(redisHost, redisPort);
-            log.info("Connected to Redis at " + redisHost + ":" + redisPort);
+            if (sentinelHosts != null && !sentinelHosts.isBlank()) {
+                Set<String> sentinels = new HashSet<>(Arrays.asList(sentinelHosts.split(",")));
+                sentinels.removeIf(String::isBlank);
+
+                pool = new JedisSentinelPool(masterName, sentinels);
+                log.info("Connected to Redis via Sentinel (master=" + masterName
+                        + ", sentinels=" + sentinels + ")");
+            } else {
+                pool = new JedisPool(redisHost, redisPort);
+                log.info("Connected to Redis directly at " + redisHost + ":" + redisPort
+                        + " (no sentinel hosts configured)");
+            }
         }
 
         @PreDestroy

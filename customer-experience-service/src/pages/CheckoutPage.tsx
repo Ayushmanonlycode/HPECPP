@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../context/AuthContext';
@@ -9,8 +10,9 @@ import Spinner from '../components/Spinner';
 import './CheckoutPage.css';
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCart();
-  const { userId, user, refreshProfile } = useAuth();
+  const { cart, loading: cartLoading, clearCart } = useCart();
+  const { userId, user, login } = useAuth();
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,32 +31,16 @@ export default function CheckoutPage() {
     zip: '',
   });
 
-  // Sync form fields whenever the user profile is loaded/updated from the backend
-  useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        fullName: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || prev.fullName,
-        phone: user.phone || prev.phone,
-        email: user.email || prev.email,
-        address1: user.address || prev.address1,
-        address2: user.address2 || prev.address2,
-        city: user.city || prev.city,
-        state: user.state || prev.state,
-        country: user.country || prev.country,
-        zip: user.zip || prev.zip,
-      }));
-    }
-  }, [user]);
 
-  // Redirect to cart if cart is empty and no order has been placed yet
+  const cartIsEmpty = !orderPlaced && !loading && !cartLoading && cart !== null && cart.items.length === 0;
+
   useEffect(() => {
-    if (!orderPlaced && !loading && (!cart || cart.items.length === 0)) {
+    if (cartIsEmpty) {
       navigate('/cart');
     }
-  }, [orderPlaced, loading, cart, navigate]);
+  }, [cartIsEmpty, navigate]);
 
-  if (!orderPlaced && !loading && (!cart || cart.items.length === 0)) {
+  if (cartIsEmpty) {
     return null;
   }
 

@@ -18,6 +18,13 @@ RUN /opt/jboss/wildfly/bin/jboss-cli.sh --command=\
 RUN /opt/jboss/wildfly/bin/standalone.sh --admin-only & \
     until /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="ls" > /dev/null 2>&1; do sleep 5; done && \
     /opt/jboss/wildfly/bin/jboss-cli.sh --connect --commands="\
+      /extension=org.wildfly.extension.opentelemetry:add(),\
+      /subsystem=opentelemetry:add(),\
+      /subsystem=opentelemetry:write-attribute(name=service-name,value=order-fulfillment-service),\
+      /subsystem=opentelemetry:write-attribute(name=endpoint,value=http://otel-collector:4317),\
+      /extension=org.wildfly.extension.microprofile.health-smallrye:add(),\
+      /subsystem=microprofile-health-smallrye:add(),\
+      /subsystem=microprofile-health-smallrye:write-attribute(name=security-enabled,value=false),\
       /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver),\
       data-source add --name=OrderFulfillmentDS --jndi-name=java:/OrdersDSP --driver-name=postgresql --connection-url=jdbc:postgresql://wf-order-fulfillment-db:5432/orderfulfillmentdb --user-name=showdown --password=showdown123 --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --validate-on-match=true,\
       shutdown" && \

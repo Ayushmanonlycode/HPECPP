@@ -1,35 +1,35 @@
 -- Categories
-INSERT INTO categories (id, name, description) VALUES
-('FISH', 'Fish', 'Various fish species'),
-('DOGS', 'Dogs', 'Various dog breeds'),
-('REPTILES', 'Reptiles', 'Various reptile species'),
-('CATS', 'Cats', 'Various cat breeds'),
-('BIRDS', 'Birds', 'Various bird species')
+INSERT INTO category (id, categoryName) VALUES
+('FISH', 'Fish'),
+('DOGS', 'Dogs'),
+('REPTILES', 'Reptiles'),
+('CATS', 'Cats'),
+('BIRDS', 'Birds')
 ON CONFLICT (id) DO NOTHING;
 
 -- Products
-INSERT INTO products (id, name, description, species, category_id) VALUES
-('FI-SW-01', 'Angelfish', 'Saltwater Angelfish', 'Fish', 'FISH'),
-('FI-SW-02', 'Tiger Shark', 'Saltwater Tiger Shark', 'Fish', 'FISH'),
-('FI-FW-01', 'Koi', 'Freshwater Koi', 'Fish', 'FISH'),
-('FI-FW-02', 'Goldfish', 'Freshwater Goldfish', 'Fish', 'FISH'),
-('K9-BD-01', 'Bulldog', 'English Bulldog', 'Dog', 'DOGS'),
-('K9-PO-02', 'Poodle', 'Standard Poodle', 'Dog', 'DOGS'),
-('K9-DL-01', 'Dalmatian', 'Dalmatian', 'Dog', 'DOGS'),
-('K9-RT-01', 'Golden Retriever', 'Golden Retriever', 'Dog', 'DOGS'),
-('K9-RT-02', 'Labrador Retriever', 'Labrador Retriever', 'Dog', 'DOGS'),
-('K9-CW-01', 'Chihuahua', 'Chihuahua', 'Dog', 'DOGS'),
-('RP-SN-01', 'Rattlesnake', 'Rattlesnake', 'Reptile', 'REPTILES'),
-('RP-LI-02', 'Iguana', 'Iguana', 'Reptile', 'REPTILES'),
-('FL-DSH-01', 'Manx', 'Manx Cat', 'Cat', 'CATS'),
-('FL-DSH-02', 'Persian', 'Persian Cat', 'Cat', 'CATS'),
-('AV-SB-02', 'Finch', 'Finch', 'Bird', 'BIRDS'),
-('AV-CB-01', 'Amazon Parrot', 'Amazon Parrot', 'Bird', 'BIRDS'),
-('AV-CB-02', 'Amazon Macaw', 'Amazon Macaw', 'Bird', 'BIRDS')
+INSERT INTO product (id, name, availability, category_id, categoryName) VALUES
+('FI-SW-01', 'Angelfish', 'In Stock', 'FISH', 'Fish'),
+('FI-SW-02', 'Tiger Shark', 'In Stock', 'FISH', 'Fish'),
+('FI-FW-01', 'Koi', 'In Stock', 'FISH', 'Fish'),
+('FI-FW-02', 'Goldfish', 'In Stock', 'FISH', 'Fish'),
+('K9-BD-01', 'Bulldog', 'In Stock', 'DOGS', 'Dogs'),
+('K9-PO-02', 'Poodle', 'In Stock', 'DOGS', 'Dogs'),
+('K9-DL-01', 'Dalmatian', 'In Stock', 'DOGS', 'Dogs'),
+('K9-RT-01', 'Golden Retriever', 'In Stock', 'DOGS', 'Dogs'),
+('K9-RT-02', 'Labrador Retriever', 'In Stock', 'DOGS', 'Dogs'),
+('K9-CW-01', 'Chihuahua', 'In Stock', 'DOGS', 'Dogs'),
+('RP-SN-01', 'Rattlesnake', 'In Stock', 'REPTILES', 'Reptiles'),
+('RP-LI-02', 'Iguana', 'In Stock', 'REPTILES', 'Reptiles'),
+('FL-DSH-01', 'Manx', 'In Stock', 'CATS', 'Cats'),
+('FL-DSH-02', 'Persian', 'In Stock', 'CATS', 'Cats'),
+('AV-SB-02', 'Finch', 'In Stock', 'BIRDS', 'Birds'),
+('AV-CB-01', 'Amazon Parrot', 'In Stock', 'BIRDS', 'Birds'),
+('AV-CB-02', 'Amazon Macaw', 'In Stock', 'BIRDS', 'Birds')
 ON CONFLICT (id) DO NOTHING;
 
 -- Items
-INSERT INTO items (id, sku, list_price, description, image_url, product_id) VALUES
+INSERT INTO item (id, sku, listPrice, itemName, imageUrl, product_id) VALUES
 ('EST-1', 'EST-1', 16.50, 'Large Angelfish', '/images/EST-1.png', 'FI-SW-01'),
 ('EST-2', 'EST-2', 16.50, 'Small Angelfish', '/images/EST-2.png', 'FI-SW-01'),
 ('EST-3', 'EST-3', 18.50, 'Toothy Tiger Shark', '/images/EST-3.png', 'FI-SW-02'),

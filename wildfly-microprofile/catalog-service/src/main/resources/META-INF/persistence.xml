@@ -15,6 +15,13 @@
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
+            <!-- Runs after schema create/update, every boot. Idempotent via
+                 ON CONFLICT DO NOTHING in data.sql, so safe to rerun. This is
+                 the Hibernate-native equivalent of Spring Boot's
+                 spring.sql.init.mode=always — committed to git, so anyone
+                 who clones the repo gets the same seed data automatically,
+                 independent of Docker volume state. -->
+            <property name="hibernate.hbm2ddl.import_files" value="data.sql"/>
         </properties>
 
     </persistence-unit>

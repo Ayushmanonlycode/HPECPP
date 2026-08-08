@@ -62,10 +62,12 @@ public class ItemRepo {
         }
     }
 
-    public Item getItemsById(String id) {
-        return em.createQuery("SELECT i FROM Item i WHERE i.id = :id", Item.class)
-                .setParameter("id", id)
-                .getSingleResult();
+    public List<Item> getItemsById(String productId) {
+        return em.createQuery(
+                        "SELECT i FROM Item i WHERE i.product.id = :productId",
+                        Item.class)
+                .setParameter("productId", productId)
+                .getResultList();
     }
 
     public List<ItemDto> getItemsByProductId(String pid) {

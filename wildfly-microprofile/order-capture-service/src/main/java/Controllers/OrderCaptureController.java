@@ -8,11 +8,13 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
 import java.util.UUID;
 
 @Path("/orders")
+@PermitAll
 public class OrderCaptureController {
 
     @Inject
@@ -20,18 +22,21 @@ public class OrderCaptureController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response placeOrder(OrderDto orderDto) {
-        Orders order= orderService.placeOrder(orderDto);
+        try {
+            Orders order = orderService.placeOrder(orderDto);
 
-
-        if(order!=null){
             orderDto.setId(order.getId());
-            return Response.ok(orderDto).build();
-        }
 
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity("Failed to place order")
-                .build();
+            return Response.ok(orderDto).build();
+
+        } catch (RuntimeException e) {
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(java.util.Map.of("message", e.getMessage()))
+                    .build();
+        }
 
     }
 

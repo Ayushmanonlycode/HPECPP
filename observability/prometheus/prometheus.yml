@@ -25,9 +25,8 @@ scrape_configs:
           - 'wf-catalog-service:8080'
           - 'wf-inventory-service:8080'
           - 'wf-order-capture-service:8080'
-          - 'wf-order-fulfilment-service:8080'
+          - 'wf-order-fulfillment-service:8080'
           - 'wf-cart-service:8080'
-
   # OTel Collector — exposes metrics received via OTLP from both stacks
   - job_name: 'otel-collector'
     metrics_path: '/metrics'
